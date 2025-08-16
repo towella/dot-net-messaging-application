@@ -19,7 +19,10 @@
         },
 
         methods: {
-
+            login() {
+                // validate input
+                this.$router.push('home');
+            }
         }
     });
 </script>
@@ -35,7 +38,7 @@
                 <label for="password-input">Password: </label>
                 <input id="password-input" placeholder="Password..."/>
             </div>
-            <button id="login-button">Log in</button>
+            <button id="login-button" v-on:click="login()">Log in</button>
         </Widget>
     </div>
 </template>

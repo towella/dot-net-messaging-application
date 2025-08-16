@@ -1,7 +1,12 @@
 :root {
-  --bodyBg1: rgb(42, 42, 42);
+  --bodyBg1: var(--darkColour);
   --bodyBg2: rgb(26, 24, 33);
-  --bodyBg3: rgb(24, 22, 54);
+  --bodyBg3: var(--secondaryStandoutColour);
+
+  --darkColour: rgb(42, 42, 42);
+  --secondaryDarkColour: rgb(33, 32, 48);
+  --standoutColour: rgb(65, 51, 122);
+  --secondaryStandoutColour: rgb(24, 22, 54);
 
   --darkGrey: rgb(33, 33, 33);
   --widgetShadow: rgba(138, 132, 152, 0.2);
@@ -14,14 +19,12 @@
 
   --buttonBg: rgb(35, 35, 35);
   --buttonHoverBg: rgb(49, 49, 49);
-  --buttonBorder: rgb(65, 51, 122);
+  --buttonBorder: var(--standoutColour);
 
   --destructiveColor: rgb(248, 64, 64);
   --constructiveColor: rgb(108, 204, 108);
 
-  --margin: 10px;
-
-  --textColor: #c9c9c9;  /*949494*/
+  --textColor: rgb(201, 201, 201);
 }
 
 html {
@@ -40,7 +43,7 @@ html {
 }
 
 h2 {
-  margin: 0 0 var(--margin) 0;
+  margin: 0 0 10px 0;
   color: var(--textColor);
 }
 
