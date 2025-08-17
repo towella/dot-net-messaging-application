@@ -54,6 +54,15 @@
         margin: auto;
         margin-top: 15%;
         align-content: center;
+        transition: background-color 0.1s;
+        transition: padding 0.1s;
+    }
+
+    #login-widget:hover {
+        background-color: var(--secondaryDarkColour);
+        padding: 15px;
+        transition: background-color 0.2s;
+        transition: padding 0.2s;
     }
 
     .login-input {

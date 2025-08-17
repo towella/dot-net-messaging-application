@@ -3,6 +3,7 @@
   --bodyBg2: rgb(26, 24, 33);
   --bodyBg3: var(--secondaryStandoutColour);
 
+  --darkestColour: rgb(26, 26, 26);
   --darkColour: rgb(42, 42, 42);
   --secondaryDarkColour: rgb(33, 32, 48);
   --standoutColour: rgb(65, 51, 122);

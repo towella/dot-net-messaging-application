@@ -23,7 +23,7 @@
   .widget {
       width: 100%;
       height: auto;
-      margin: var(--margin);
+      margin: 10px;
       padding: 10px;
       background-color: var(--widgetBackground);
       backdrop-filter: blur(10px);
