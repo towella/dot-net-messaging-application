@@ -27,7 +27,7 @@
 <template>
     <div id="settings">
         <div id="header">
-            <Button v-on:click="returnHome()"><</Button>
+            <Button class="back-button" v-on:click="returnHome()"><</Button>
             <h1>Settings</h1>
             <div></div>
         </div>
@@ -44,5 +44,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        border-bottom: var(--darkestColour) 1px solid;
+        box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
+        margin: 10px;
     }
 </style>

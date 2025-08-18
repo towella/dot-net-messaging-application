@@ -36,6 +36,10 @@
                 <input id="email-input" placeholder="Email..."/>
             </div>
             <div class="new-account-input">
+                <label for="pronouns-input">Pronouns: </label>
+                <input id="email-input" placeholder="they/them/theirs..."/>
+            </div>
+            <div class="new-account-input">
                 <label for="username-input">Username: </label>
                 <input id="username-input" placeholder="Username..."/>
             </div>

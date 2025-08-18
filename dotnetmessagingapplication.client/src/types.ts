@@ -9,5 +9,4 @@ export interface Message {
   authorId: String
   authorName: String
   body: String
-  
 }
