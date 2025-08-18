@@ -8,6 +8,7 @@
   --secondaryDarkColour: rgb(33, 32, 48);
   --standoutColour: rgb(65, 51, 122);
   --secondaryStandoutColour: rgb(24, 22, 54);
+  --highlightColour: rgb(137, 90, 220);
 
   --darkGrey: rgb(33, 33, 33);
   --widgetShadow: rgba(138, 132, 152, 0.2);
@@ -26,6 +27,7 @@
   --constructiveColour: rgb(108, 204, 108);
 
   --textColour: rgb(201, 201, 201);
+  --inputBackgroundColour: rgb(235, 235, 235);
 }
 
 html {
@@ -49,14 +51,26 @@ h2 {
 }
 
 a {
-  text-decoration: none;
+  text-decoration: underline;
   color: var(--textColour);
+  margin: 10px;
+}
+
+a:hover {
+  color: var(--highlightColour);
 }
 
 input {
   padding: 5px;
   margin: 2px;
   border-radius: 8px;
+  background-color: var(--inputBackgroundColour);
+}
+
+textarea {
+  font-family: Arial, sans-serif;
+  padding: 5px;
+  background-color: var(--inputBackgroundColour);
 }
 
 button {

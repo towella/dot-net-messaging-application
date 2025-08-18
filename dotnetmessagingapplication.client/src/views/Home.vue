@@ -31,10 +31,6 @@
             async changeChat(chatId: String) {
 
             },
-
-            openPage(pageName: String) {
-                this.$router.push(pageName);
-            },
         }
     });
 </script>
@@ -44,8 +40,8 @@
         <img id="app-icon" src="https://1000logos.net/wp-content/uploads/2021/06/Discord-logo.png"></img>
         <div id="settings-buttons">
             <!-- <input type="image" src="https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png"></input> -->
-            <button v-on:click="openPage('settings')">Settings</button>
-            <button v-on:click="openPage('account')">Account</button>
+            <RouterLink :to="{name: 'Settings'}">Settings</RouterLink>
+            <RouterLink :to="{name: 'Account'}">Account</RouterLink>
         </div>
     </div>
 
@@ -75,8 +71,8 @@
             <div id="chat-window-header">
                 <h2 id="chat-heading">Chat Name</h2>
                 <div id="call-buttons">
-                    <button>Call</button>
-                    <button>Video call</button>
+                    <RouterLink :to="{name: 'Login'}">Call</RouterLink>
+                    <RouterLink :to="{name: 'Login'}">Video call</RouterLink>
                 </div>
             </div>
 
@@ -181,6 +177,8 @@
     }
 
     #call-buttons {
+        display: flex;
+        align-content: center;
         margin-top: 3px;
         margin-bottom: 3px;
         margin-right: 3%
@@ -206,7 +204,7 @@
         resize: none;
         field-sizing: content;
         max-height: 12rem;
-        min-height: 2rem;
+        min-height: 25px;
     }
 
     #send-button {
