@@ -46,6 +46,9 @@
     display: flex;
     flex-direction: column;
     text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   h3 {

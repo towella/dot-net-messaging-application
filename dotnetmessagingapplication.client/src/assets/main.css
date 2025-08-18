@@ -22,16 +22,16 @@
   --buttonHoverBg: rgb(49, 49, 49);
   --buttonBorder: var(--standoutColour);
 
-  --destructiveColor: rgb(248, 64, 64);
-  --constructiveColor: rgb(108, 204, 108);
+  --destructiveColour: rgb(248, 64, 64);
+  --constructiveColour: rgb(108, 204, 108);
 
-  --textColor: rgb(201, 201, 201);
+  --textColour: rgb(201, 201, 201);
 }
 
 html {
   background-image: linear-gradient(to bottom right, var(--bodyBg1), var(--bodyBg2), var(--bodyBg3));
   background-size: 100% 130%;
-  color: var(--textColor);
+  color: var(--textColour);
   font-family: Arial, sans-serif;
   font-size: 1em;
   line-height: 1.4;
@@ -45,12 +45,12 @@ html {
 
 h2 {
   margin: 0 0 10px 0;
-  color: var(--textColor);
+  color: var(--textColour);
 }
 
 a {
   text-decoration: none;
-  color: var(--textColor);
+  color: var(--textColour);
 }
 
 input {
@@ -60,7 +60,7 @@ input {
 }
 
 button {
-  color: var(--textColor);
+  color: var(--textColour);
   font-weight: bold;
   background-color: var(--buttonBg);
   border: var(--buttonBorder) 2px solid;
@@ -109,6 +109,6 @@ select {
   background-color: var(--textBubbleBg);
   border: var(--textBubbleBorder) 2px solid;
   border-radius: 20px;
-  color: var(--textColor);
+  color: var(--textColour);
   text-align: center;
 }

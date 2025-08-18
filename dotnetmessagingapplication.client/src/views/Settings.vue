@@ -17,14 +17,32 @@
         },
 
         methods: {
-
+            returnHome() {
+                this.$router.push('home');
+            }
         }
     });
 </script>
 
 <template>
-    <h1>This is settings</h1>
+    <div id="settings">
+        <div id="header">
+            <Button v-on:click="returnHome()"><</Button>
+            <h1>Settings</h1>
+            <div></div>
+        </div>
+    </div>
 </template>
 
 <style scoped>
+    #settings {
+        width: 100%;
+        background-color: var(--darkColour);
+    }
+
+    #header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 </style>

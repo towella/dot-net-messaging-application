@@ -10,7 +10,9 @@
         data() {
             return {
                 chatListTabSelected: "dm" as String,
-                chats: [{id: "id", name: "da boyz", lastMessage: "noice"}] as Array<types.Chat>,
+                chats: [{id: "id", name: "da boyz", lastMessage: "noice"},
+                        {id: "asd", name: "pijins", lastMessage: "this is the last message"}
+                ] as Array<types.Chat>,
             };
         },
 
@@ -23,7 +25,16 @@
             async switchTab(tab: String) {
                 this.chatListTabSelected = tab;
                 // repopulate chats list with API call
-            }
+                this.chats = [];
+            },
+
+            async changeChat(chatId: String) {
+
+            },
+
+            openPage(pageName: String) {
+                this.$router.push(pageName);
+            },
         }
     });
 </script>
@@ -33,14 +44,13 @@
         <img id="app-icon" src="https://1000logos.net/wp-content/uploads/2021/06/Discord-logo.png"></img>
         <div id="settings-buttons">
             <!-- <input type="image" src="https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png"></input> -->
-            <button>Settings</button>
-            <button>Account</button>
+            <button v-on:click="openPage('settings')">Settings</button>
+            <button v-on:click="openPage('account')">Account</button>
         </div>
-        
     </div>
+
     <div id="body-content">
         <div id="chat-list">
-
             <div id="chat-list-actions">
                 <input placeholder="Search chats..."></input>
                 <button>New Chat</button>
@@ -56,7 +66,7 @@
             </div>
 
             <div v-if="chats.length > 0" v-for="chat in chats">
-                <ChatSelectBox :chat-name="chat.name" :last-message="chat.lastMessage"></ChatSelectBox>
+                <ChatSelectBox :chat-name="chat.name" :last-message="chat.lastMessage" v-on:click="changeChat(chat.id)"></ChatSelectBox>
             </div>
             <p v-else>No chats, time to start a conversation!</p>
         </div>
@@ -69,8 +79,14 @@
                     <button>Video call</button>
                 </div>
             </div>
+
             <div id="chat-window">
-                <h1>chat window</h1>
+
+            </div>
+
+            <div id="input-bar">
+                <textarea id="message-input" type="text" placeholder="Message the chat..."></textarea>
+                <button id="send-button">Send</button>
             </div>
         </div>
     </div>
@@ -173,5 +189,29 @@
     #chat-window {
         width: 100%;
         height: 100%;
+    }
+
+    #input-bar {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        width: 100%;
+        padding: 10px;
+    }
+
+    #message-input {
+        width: 80%;
+        font-size: 20px;
+        overflow-x: hidden;
+        resize: none;
+        field-sizing: content;
+        max-height: 12rem;
+        min-height: 2rem;
+    }
+
+    #send-button {
+        height: fit-content;
+        margin: 0;
+        margin-left: 10px;
     }
 </style>
