@@ -5,6 +5,14 @@ namespace DotNetMessagingApplication.Server.Data;
 
 public class MessagingAppContext : DbContext
 {
+	public DbSet<Child> Children { get; set; }
+
+	public DbSet<Message> Messages { get; set; }
+
+	public DbSet<Relationship> Relationships { get; set; }
+
+	public DbSet<Settings> Settings { get; set; }
+
 	public DbSet<User> Users { get; set; }
 
 	readonly string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "messaging.db");
