@@ -16,9 +16,11 @@ public class MessagingAppContext : DbContext
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+		// composite FK for Relationship entity
 		modelBuilder.Entity<Relationship>()
 			.HasKey(f => new { f.UserId, f.OtherPersonId });
 
+		// many to many self referencing relationship for Users
 		modelBuilder.Entity<Relationship>()
 			.HasOne(f => f.OtherPerson)
 			.WithMany(f => f.Following)
@@ -30,6 +32,7 @@ public class MessagingAppContext : DbContext
 			.WithMany(f => f.Followers)
 			.HasForeignKey(f => f.UserId);
 
+		// one to one relationship for Users and Settings
 		modelBuilder.Entity<User>()
 			.HasOne(e => e.Settings)
 			.WithOne(e => e.User)
