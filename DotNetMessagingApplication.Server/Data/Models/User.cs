@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace DotNetMessagingApplication.Server.Data.Models;
 
 [Index(nameof(Username), IsUnique = true)]
+[Index(nameof(Email), IsUnique = true)]
 public class User
 {
 	[Key]
