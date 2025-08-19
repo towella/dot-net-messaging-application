@@ -1,7 +1,5 @@
-﻿using DotNetMessagingApplication.Server.Data.Enums;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DotNetMessagingApplication.Server.Data.Models;
 
@@ -31,17 +29,4 @@ public class User
 	public int SettingsId { get; set; }
 
 	public Settings Settings { get; set; } = null!;
-}
-
-public class Relationship
-{
-	public int UserId { get; set; }
-
-	public User? User { get; set; }
-
-	public int OtherPersonId { get; set; }
-
-	public User? OtherPerson { get; set; }
-
-	public RelationshipType RelationshipType { get; set; } = RelationshipType.None;
 }
