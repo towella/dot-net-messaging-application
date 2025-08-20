@@ -27,13 +27,16 @@ public class MessagingAppContext : DbContext
 		// many to many self referencing relationship for Users
 		modelBuilder.Entity<Relationship>()
 			.HasOne(f => f.OtherPerson)
-			.WithMany(f => f.Following)
+			.WithMany(f => f.Followers)
 			.HasForeignKey(f => f.OtherPersonId)
 			.OnDelete(DeleteBehavior.Restrict);
 
 		modelBuilder.Entity<Relationship>()
+			// User = left hand col of associative entity
 			.HasOne(f => f.User)
-			.WithMany(f => f.Followers)
+			// User.Following: list where User is the left hand col
+			// therefore one User can have multiple diff users in the right hand col
+			.WithMany(f => f.Following)
 			.HasForeignKey(f => f.UserId);
 
 		// one to one relationship for Users and Settings
@@ -42,10 +45,12 @@ public class MessagingAppContext : DbContext
 			.WithOne(e => e.User)
 			.HasForeignKey<Settings>(s => s.SettingsId);
 
+		// Users to Messages mapping
 		modelBuilder.Entity<Message>()
 			.HasOne(e => e.Sender)
 			.WithMany(e => e.MessagesSent)
-			.HasForeignKey(e => e.SenderId);
+			.HasForeignKey(e => e.SenderId)
+			.OnDelete(DeleteBehavior.Restrict);
 
 		modelBuilder.Entity<Message>()
 			.HasOne(e => e.Recipient)
