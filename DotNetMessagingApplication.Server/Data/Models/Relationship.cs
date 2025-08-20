@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotNetMessagingApplication.Server.Data.Models;
 
+// User follows OtherPerson
+// i.e. User is the follower, OtherPerson is being followed
+
 [PrimaryKey(nameof(UserId), nameof(OtherPersonId))]
 public class Relationship
 {
