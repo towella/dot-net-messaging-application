@@ -30,4 +30,8 @@ public class User
 	public int SettingsId { get; set; }
 
 	public Settings Settings { get; set; } = null!;
+
+	public ICollection<Message>? MessagesSent { get; set; }
+
+	public ICollection<Message>? MessagesReceived { get; set; }
 }

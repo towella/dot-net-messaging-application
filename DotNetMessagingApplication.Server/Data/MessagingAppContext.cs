@@ -45,5 +45,13 @@ public class MessagingAppContext : DbContext
 			.HasOne(e => e.Settings)
 			.WithOne(e => e.User)
 			.HasForeignKey<Settings>(s => s.SettingsId);
+
+		modelBuilder.Entity<User>()
+			.HasMany(e => e.MessagesSent)
+			.WithOne(e => e.Sender);
+
+		modelBuilder.Entity<User>()
+			.HasMany(e => e.MessagesReceived)
+			.WithOne(e => e.Recipient);
 	}
 }
