@@ -26,35 +26,32 @@ public class MessagingAppContext : DbContext
 	{
 		// many to many self referencing relationship for Users
 		modelBuilder.Entity<Relationship>()
-			.HasOne(f => f.OtherPerson)
-			.WithMany(f => f.Followers)
-			.HasForeignKey(f => f.OtherPersonId)
+			.HasOne(u => u.OtherPerson)
+			.WithMany(u => u.Followers)
+			.HasForeignKey(u => u.OtherPersonId)
 			.OnDelete(DeleteBehavior.Restrict);
 
 		modelBuilder.Entity<Relationship>()
-			// User = left hand col of associative entity
-			.HasOne(f => f.User)
-			// User.Following: list where User is the left hand col
-			// therefore one User can have multiple diff users in the right hand col
-			.WithMany(f => f.Following)
-			.HasForeignKey(f => f.UserId);
+			.HasOne(u => u.User)
+			.WithMany(u => u.Following)
+			.HasForeignKey(u => u.UserId);
 
 		// one to one relationship for Users and Settings
 		modelBuilder.Entity<User>()
-			.HasOne(e => e.Settings)
-			.WithOne(e => e.User)
+			.HasOne(u => u.Settings)
+			.WithOne(s => s.User)
 			.HasForeignKey<Settings>(s => s.SettingsId);
 
 		// Users to Messages mapping
 		modelBuilder.Entity<Message>()
-			.HasOne(e => e.Sender)
-			.WithMany(e => e.MessagesSent)
-			.HasForeignKey(e => e.SenderId)
+			.HasOne(m => m.Sender)
+			.WithMany(u => u.MessagesSent)
+			.HasForeignKey(m => m.SenderId)
 			.OnDelete(DeleteBehavior.Restrict);
 
 		modelBuilder.Entity<Message>()
-			.HasOne(e => e.Recipient)
-			.WithMany(e => e.MessagesReceived)
-			.HasForeignKey(e => e.RecipientId);
+			.HasOne(m => m.Recipient)
+			.WithMany(u => u.MessagesReceived)
+			.HasForeignKey(m => m.RecipientId);
 	}
 }
