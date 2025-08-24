@@ -12,5 +12,5 @@ public class GroupChat : Chat
 	[Required]
 	public User Admin { get; set; } = null!;
 
-	public ICollection<User> Members { get; set; } = null!;
+	public ICollection<GroupChatMember> Members { get; set; } = null!;
 }

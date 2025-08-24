@@ -43,7 +43,13 @@ public class User
 
 	public ICollection<Message>? MessagesSent { get; set; }
 
-	public ICollection<Message>? MessagesReceived { get; set; }
-
 	public ICollection<Reaction>? ReactionsGiven { get; set; }
+
+	public ICollection<DirectMessage>? DirectMessageAsUser { get; set; }
+
+	public ICollection<DirectMessage>? DirectMessageAsOtherPerson { get; set; }
+
+	public ICollection<GroupChat>? GroupChatAdminOf { get; set; }
+
+	public ICollection<GroupChatMember>? GroupChatMemberships { get; set; }
 }

@@ -12,3 +12,9 @@ public enum PrivacyLevel
 	Public,
 	Private
 }
+
+public enum GroupChatRole
+{
+	Member,
+	Admin
+}
