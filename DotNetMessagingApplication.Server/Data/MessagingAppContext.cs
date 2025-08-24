@@ -7,7 +7,13 @@ public class MessagingAppContext : DbContext
 {
 	public DbSet<Child> Children { get; set; }
 
+	public DbSet<DirectMessage> DirectMessages { get; set; }
+
+	public DbSet<GroupChat> GroupChats { get; set; }
+
 	public DbSet<Message> Messages { get; set; }
+
+	public DbSet<Reaction> Reactions { get; set; }
 
 	public DbSet<Relationship> Relationships { get; set; }
 

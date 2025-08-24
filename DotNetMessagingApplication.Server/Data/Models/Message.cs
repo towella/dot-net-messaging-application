@@ -20,4 +20,9 @@ public class Message
 	public string MessageBody { get; set; } = null!;
 
 	public DateTime TimeSent { get; set; }
+
+	public int ChatId { get; set; }
+
+	[Required]
+	public Chat Chat { get; set; } = null!;
 }

@@ -19,4 +19,6 @@ public class Settings
 	public bool SendEmailNotifications { get; set; } = false;
 
 	public PrivacyLevel PrivacyLevel { get; set; } = PrivacyLevel.Private;
+
+	public string Theme { get; set; } = "Dark";
 }
