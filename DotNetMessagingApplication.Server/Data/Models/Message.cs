@@ -12,9 +12,9 @@ public class Message
 	public User Sender { get; set; } = null!;
 
 	[Required]
-	public int RecipientId { get; set; }
+	public int RecipientChatId { get; set; }
 
-	public User Recipient { get; set; } = null!;
+	public Chat RecipientChat { get; set; } = null!;
 
 	[Required]
 	public string MessageBody { get; set; } = null!;

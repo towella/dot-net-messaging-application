@@ -56,8 +56,8 @@ public class MessagingAppContext : DbContext
 			.OnDelete(DeleteBehavior.Restrict);
 
 		modelBuilder.Entity<Message>()
-			.HasOne(m => m.Recipient)
-			.WithMany(u => u.MessagesReceived)
-			.HasForeignKey(m => m.RecipientId);
+			.HasOne(m => m.RecipientChat)
+			.WithMany(u => u.Messages)
+			.HasForeignKey(m => m.RecipientChatId);
 	}
 }
