@@ -3,6 +3,7 @@ using System;
 using DotNetMessagingApplication.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotNetMessagingApplication.Server.Migrations
 {
     [DbContext(typeof(MessagingAppContext))]
-    partial class MessagingAppContextModelSnapshot : ModelSnapshot
+    [Migration("20250824065600_RemoveRecipientUser")]
+    partial class RemoveRecipientUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
@@ -37,24 +40,6 @@ namespace DotNetMessagingApplication.Server.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.GroupChatMember", b =>
-                {
-                    b.Property<int>("GroupChatId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("GroupChatId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("GroupChatMember");
-                });
-
             modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.Message", b =>
                 {
                     b.Property<int>("MessageId")
@@ -77,6 +62,9 @@ namespace DotNetMessagingApplication.Server.Migrations
                     b.Property<DateTime>("TimeSent")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("MessageId");
 
                     b.HasIndex("ChatId");
@@ -84,6 +72,8 @@ namespace DotNetMessagingApplication.Server.Migrations
                     b.HasIndex("RecipientChatId");
 
                     b.HasIndex("SenderId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Messages");
                 });
@@ -172,6 +162,9 @@ namespace DotNetMessagingApplication.Server.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("GroupChatChatId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -197,6 +190,8 @@ namespace DotNetMessagingApplication.Server.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("GroupChatChatId");
 
                     b.HasIndex("Username")
                         .IsUnique();
@@ -253,25 +248,6 @@ namespace DotNetMessagingApplication.Server.Migrations
                     b.HasDiscriminator().HasValue("Child");
                 });
 
-            modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.GroupChatMember", b =>
-                {
-                    b.HasOne("DotNetMessagingApplication.Server.Data.Models.GroupChat", "GroupChat")
-                        .WithMany("Members")
-                        .HasForeignKey("GroupChatId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DotNetMessagingApplication.Server.Data.Models.User", "User")
-                        .WithMany("GroupChatMemberships")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("GroupChat");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.Message", b =>
                 {
                     b.HasOne("DotNetMessagingApplication.Server.Data.Models.Chat", "Chat")
@@ -291,6 +267,10 @@ namespace DotNetMessagingApplication.Server.Migrations
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("DotNetMessagingApplication.Server.Data.Models.User", null)
+                        .WithMany("MessagesReceived")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Chat");
 
@@ -348,18 +328,25 @@ namespace DotNetMessagingApplication.Server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.User", b =>
+                {
+                    b.HasOne("DotNetMessagingApplication.Server.Data.Models.GroupChat", null)
+                        .WithMany("Members")
+                        .HasForeignKey("GroupChatChatId");
+                });
+
             modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.DirectMessage", b =>
                 {
                     b.HasOne("DotNetMessagingApplication.Server.Data.Models.User", "OtherPerson")
-                        .WithMany("DirectMessageAsOtherPerson")
+                        .WithMany()
                         .HasForeignKey("OtherPersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DotNetMessagingApplication.Server.Data.Models.User", "User")
-                        .WithMany("DirectMessageAsUser")
+                        .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("OtherPerson");
@@ -370,9 +357,9 @@ namespace DotNetMessagingApplication.Server.Migrations
             modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.GroupChat", b =>
                 {
                     b.HasOne("DotNetMessagingApplication.Server.Data.Models.User", "Admin")
-                        .WithMany("GroupChatAdminOf")
+                        .WithMany()
                         .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Admin");
@@ -396,17 +383,11 @@ namespace DotNetMessagingApplication.Server.Migrations
 
             modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.User", b =>
                 {
-                    b.Navigation("DirectMessageAsOtherPerson");
-
-                    b.Navigation("DirectMessageAsUser");
-
                     b.Navigation("Followers");
 
                     b.Navigation("Following");
 
-                    b.Navigation("GroupChatAdminOf");
-
-                    b.Navigation("GroupChatMemberships");
+                    b.Navigation("MessagesReceived");
 
                     b.Navigation("MessagesSent");
 

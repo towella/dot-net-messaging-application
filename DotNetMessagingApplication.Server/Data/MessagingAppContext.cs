@@ -7,7 +7,13 @@ public class MessagingAppContext : DbContext
 {
 	public DbSet<Child> Children { get; set; }
 
+	public DbSet<DirectMessage> DirectMessages { get; set; }
+
+	public DbSet<GroupChat> GroupChats { get; set; }
+
 	public DbSet<Message> Messages { get; set; }
+
+	public DbSet<Reaction> Reactions { get; set; }
 
 	public DbSet<Relationship> Relationships { get; set; }
 
@@ -50,8 +56,41 @@ public class MessagingAppContext : DbContext
 			.OnDelete(DeleteBehavior.Restrict);
 
 		modelBuilder.Entity<Message>()
-			.HasOne(m => m.Recipient)
-			.WithMany(u => u.MessagesReceived)
-			.HasForeignKey(m => m.RecipientId);
+			.HasOne(m => m.RecipientChat)
+			.WithMany(u => u.Messages)
+			.HasForeignKey(m => m.RecipientChatId);
+
+
+		// direct messages
+		modelBuilder.Entity<DirectMessage>()
+			.HasOne(dm => dm.User)
+			.WithMany(u => u.DirectMessageAsUser)
+			.HasForeignKey(dm => dm.UserId)
+			.OnDelete(DeleteBehavior.Restrict);
+
+		modelBuilder.Entity<DirectMessage>()
+			.HasOne(dm => dm.OtherPerson)
+			.WithMany(u => u.DirectMessageAsOtherPerson)
+			.HasForeignKey(dm => dm.OtherPersonId);
+
+
+		// group chat admins (one admin per gc)
+		modelBuilder.Entity<GroupChat>()
+			.HasOne(gc => gc.Admin)
+			.WithMany(a => a.GroupChatAdminOf)
+			.HasForeignKey(gc => gc.AdminId)
+			.OnDelete(DeleteBehavior.Restrict);
+
+		// group chat members (many to many)
+		modelBuilder.Entity<GroupChatMember>()
+			.HasOne(m => m.GroupChat)
+			.WithMany(gc => gc.Members)
+			.HasForeignKey(m => m.GroupChatId)
+			.OnDelete(DeleteBehavior.Restrict);
+
+		modelBuilder.Entity<GroupChatMember>()
+			.HasOne(m => m.User)
+			.WithMany(u => u.GroupChatMemberships)
+			.HasForeignKey(m => m.UserId);
 	}
 }
