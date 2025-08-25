@@ -1,35 +1,138 @@
-@import './base.css';
+:root {
+  --bodyBg1: var(--darkColour);
+  --bodyBg2: rgb(26, 24, 33);
+  --bodyBg3: var(--secondaryStandoutColour);
+
+  --darkestColour: rgb(26, 26, 26);
+  --darkColour: rgb(42, 42, 42);
+  --secondaryDarkColour: rgb(33, 32, 48);
+  --standoutColour: rgb(65, 51, 122);
+  --secondaryStandoutColour: rgb(24, 22, 54);
+  --highlightColour: rgb(137, 90, 220);
+
+  --darkGrey: rgb(33, 33, 33);
+  --widgetShadow: rgba(138, 132, 152, 0.2);
+  --widgetBackground: rgba(59, 55, 86, 0.1);
+  --widgetBorder: rgb(94, 94, 94);
+
+  --textBubbleBg: rgb(35, 35, 35);
+  --textBubbleBorder: rgb(82, 82, 82);
+  --textBubbleMargin: 5px;
+
+  --buttonBg: rgb(35, 35, 35);
+  --buttonHoverBg: rgb(49, 49, 49);
+  --buttonBorder: var(--standoutColour);
+
+  --destructiveColour: rgb(248, 64, 64);
+  --constructiveColour: rgb(108, 204, 108);
+
+  --textColour: rgb(201, 201, 201);
+  --inputBackgroundColour: rgb(235, 235, 235);
+}
+
+html {
+  background-image: linear-gradient(to bottom right, var(--bodyBg1), var(--bodyBg2), var(--bodyBg3));
+  background-size: 100% 130%;
+  color: var(--textColour);
+  font-family: Arial, sans-serif;
+  font-size: 1em;
+  line-height: 1.4;
+}
 
 #app {
-  max-width: 1280px;
+  min-height: 850px;
   margin: 0 auto;
-  padding: 2rem;
   font-weight: normal;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+h2 {
+  margin: 0 0 10px 0;
+  color: var(--textColour);
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+a {
+  text-decoration: underline;
+  color: var(--textColour);
+  margin: 10px;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+img {
+  width: auto;
+  height: auto;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+a:hover {
+  color: var(--highlightColour);
+}
+
+input {
+  padding: 5px;
+  margin: 2px;
+  border-radius: 8px;
+  background-color: var(--inputBackgroundColour);
+}
+
+textarea {
+  font-family: Arial, sans-serif;
+  padding: 5px;
+  background-color: var(--inputBackgroundColour);
+}
+
+button {
+  color: var(--textColour);
+  font-weight: bold;
+  background-color: var(--buttonBg);
+  border: var(--buttonBorder) 2px solid;
+  margin: 5px;
+  padding: 10px;
+  font-size: 15px;
+  border-radius: 8px;
+}
+
+button:hover {
+  color: #d9d9d9;
+  background-color: var(--buttonHoverBg);
+}
+
+.hoverable:hover {
+  color: #a2a2a2;
+}
+
+.destructive-button, .constructive-button {
+  color: white;
+  background-color: var(--textBubbleBg);
+  border-radius: 10px;
+  border: var(--textBubbleBorder) 2px solid;
+  margin: var(--textBubbleMargin);
+  padding: 10px;
+}
+
+.constructive-button {
+  font-weight: normal;
+  font-size: 14px;
+}
+
+.destructive-button:hover {
+  color: var(--destructiveColor);
+  border-color: var(--destructiveColor);
+}
+
+.constructive-button:hover {
+  color: var(--constructiveColor);
+  border-color: var(--constructiveColor);
+}
+
+.back-button {
+  margin-left: 20px;
+  font-size: 30px;
+}
+
+select {
+  margin: 0 0 10px 0;
+  padding: 10px;
+  background-color: var(--textBubbleBg);
+  border: var(--textBubbleBorder) 2px solid;
+  border-radius: 20px;
+  color: var(--textColour);
+  text-align: center;
 }

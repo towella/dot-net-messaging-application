@@ -19,38 +19,47 @@
         },
 
         methods: {
-            login() {
+            create() {
                 // validate input
-                this.$router.push('user-id-example/home');
+                // create account
+                this.$router.push('user-id-example-2/home');
             }
         }
     });
 </script>
 
 <template>
-    <div id="login">
-        <Widget id="login-widget" title="Log In">
-            <div class="login-input">
-                <label for="username-email-input">Username/Email: </label>
-                <input id="username-email-input" placeholder="Username/Email..."/>
+    <div id="new-account">
+        <Widget id="new-account-widget" title="New Account">
+            <div class="new-account-input">
+                <label for="email-input">Email: </label>
+                <input id="email-input" placeholder="Email..."/>
             </div>
-            <div class="login-input">
+            <div class="new-account-input">
+                <label for="pronouns-input">Pronouns: </label>
+                <input id="email-input" placeholder="they/them/theirs..."/>
+            </div>
+            <div class="new-account-input">
+                <label for="username-input">Username: </label>
+                <input id="username-input" placeholder="Username..."/>
+            </div>
+            <div class="new-account-input">
                 <label for="password-input">Password: </label>
                 <input id="password-input" placeholder="Password..."/>
             </div>
-            <button id="login-button" v-on:click="login()">Log in</button>
-            <RouterLink id="create-account-link" :to="{name: 'NewAccount'}">Create a new account</RouterLink>
+            <button id="create-button" v-on:click="create()">Create</button>
+            <RouterLink id="login-link" :to="{name: 'Login'}">Back to login</RouterLink>
         </Widget>
     </div>
 </template>
 
 <style scoped>
-    #login {
+    #new-account {
         margin: auto;
         display: flex;
     }
 
-    #login-widget {
+    #new-account-widget {
         display: flex;
         flex-direction: column;
         width: 350px;
@@ -62,22 +71,22 @@
         transition: padding 0.1s;
     }
 
-    #login-widget:hover {
+    #new-account-widget:hover {
         background-color: var(--secondaryDarkColour);
         padding: 15px;
         transition: background-color 0.2s;
         transition: padding 0.2s;
     }
 
-    .login-input {
+    .new-account-input {
         margin: 5px;
     }
 
-    #login-button {
+    #create-button {
         margin-top: 10px;
     }
 
-    #create-account-link {
+    #login-link {
         margin-top: 10px;
     }
 </style>
