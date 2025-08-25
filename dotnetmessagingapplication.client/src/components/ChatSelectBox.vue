@@ -27,6 +27,7 @@
   .chat-select-box {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin: 10px;
     padding: 10px;
     background-color: var(--darkColour);
@@ -49,6 +50,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-right: 10px;
   }
 
   h3 {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import ChatSelectBox from "../components/ChatSelectBox.vue"
+    import MessageBubble from "../components/MessageBubble.vue"
 </script>
 
 <script lang="ts">
@@ -7,12 +8,16 @@
     import * as types from '../types.ts'
 
     export default defineComponent({
+        props: {
+            id: String,
+        },
         data() {
             return {
                 chatListTabSelected: "dm" as String,
-                chats: [{id: "id", name: "da boyz", lastMessage: "noice"},
-                        {id: "asd", name: "pijins", lastMessage: "this is the last message"}
+                chats: [{id: "id", name: "da boyz", messages: [{authorId: "author id", authorName: "Name", body: "message!!"}]},
+                        {id: "asd", name: "pijins", messages: []}
                 ] as Array<types.Chat>,
+                selectedChatIndex: 0 as Number,
             };
         },
 
@@ -22,7 +27,7 @@
         },
 
         methods: {
-            async switchTab(tab: String) {
+            switchTab(tab: String) {
                 this.chatListTabSelected = tab;
                 // repopulate chats list with API call
                 this.chats = [];
@@ -31,16 +36,30 @@
             async changeChat(chatId: String) {
 
             },
+
+            sendMessage() {
+                let messageInput: HTMLTextAreaElement | null = document.getElementById("message-input") as HTMLTextAreaElement | null;
+                let messageText: String = messageInput?.value ?? "";
+                console.log(messageText);
+                if (messageInput && messageText != "") {
+                    this.chats[0].messages.push({
+                        authorId: this.$route.params.id,
+                        authorName: "Name",
+                        body: messageText,
+                    } as types.Message);
+                    messageInput.value = "";
+                }
+            }
         }
     });
 </script>
 
 <template>
     <div id="header">
-        <img id="app-icon" src="https://1000logos.net/wp-content/uploads/2021/06/Discord-logo.png"></img>
+        <RouterLink :to="{name: 'Login'}" style="padding-left: 40px;"><img id="app-icon" style="width: 200px; margin: 0px;" src="../assets/logo.png"></img></RouterLink>
         <div id="settings-buttons">
             <!-- <input type="image" src="https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png"></input> -->
-            <RouterLink :to="{name: 'Settings'}">Settings</RouterLink>
+            <RouterLink :to="{name: 'Settings'}"><img src="../assets/icons/settings.png" style="width: 40px;" /></RouterLink>
             <RouterLink :to="{name: 'Account'}">Account</RouterLink>
         </div>
     </div>
@@ -48,8 +67,11 @@
     <div id="body-content">
         <div id="chat-list">
             <div id="chat-list-actions">
-                <input placeholder="Search chats..."></input>
-                <button>New Chat</button>
+                <div style="display: flex; align-items: center;">
+                    <label for="chat-search"><img src="../assets/icons/search.png" style="width: 20px; padding-top: 5px;" /></label>
+                    <input id="chat-search" placeholder="Search chats..." />
+                </div>
+                <button style="padding: 3px;"><img src="../assets/icons/message.png" style="width: 30px;" /></button>
             </div>
 
             <div id="chat-list-tabs">
@@ -62,7 +84,7 @@
             </div>
 
             <div v-if="chats.length > 0" v-for="chat in chats">
-                <ChatSelectBox :chat-name="chat.name" :last-message="chat.lastMessage" v-on:click="changeChat(chat.id)"></ChatSelectBox>
+                <ChatSelectBox :chat-name="chat.name" :last-message="chat.messages[chat.messages.length-1]?.body ?? 'No messages yet...'" v-on:click="changeChat(chat.id)"></ChatSelectBox>
             </div>
             <p v-else>No chats, time to start a conversation!</p>
         </div>
@@ -71,18 +93,21 @@
             <div id="chat-window-header">
                 <h2 id="chat-heading">Chat Name</h2>
                 <div id="call-buttons">
-                    <RouterLink :to="{name: 'Login'}">Call</RouterLink>
-                    <RouterLink :to="{name: 'Login'}">Video call</RouterLink>
+                    <RouterLink :to="{name: 'Login'}"><img src="../assets/icons/call.png" style="width: 40px;"/></RouterLink>
+                    <RouterLink :to="{name: 'Login'}"><img src="../assets/icons/video.png" style="width: 40px;"/></RouterLink>
                 </div>
             </div>
 
             <div id="chat-window">
-
+                <MessageBubble v-if="chats[selectedChatIndex]?.messages.length > 0" 
+                    v-for="m in chats[selectedChatIndex]?.messages"
+                    :sender="m.authorName" :body="m.body" :external-message="m.authorId != $route.params.id"></MessageBubble>
+                <p v-else style="align-self: center;">No one has said anything yet. Start the conversation!</p>
             </div>
 
             <div id="input-bar">
                 <textarea id="message-input" type="text" placeholder="Message the chat..."></textarea>
-                <button id="send-button">Send</button>
+                <button id="send-button" v-on:click="sendMessage()">Send</button>
             </div>
         </div>
     </div>
@@ -168,6 +193,7 @@
     #chat-window-header {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         background-color: var(--secondaryDarkColour);
         width: 100%;
     }
@@ -185,8 +211,12 @@
     }
 
     #chat-window {
+        display: flex;
+        flex-direction: column;
         width: 100%;
         height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     #input-bar {

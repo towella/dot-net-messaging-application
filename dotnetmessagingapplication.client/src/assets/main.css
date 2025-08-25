@@ -56,6 +56,11 @@ a {
   margin: 10px;
 }
 
+img {
+  width: auto;
+  height: auto;
+}
+
 a:hover {
   color: var(--highlightColour);
 }

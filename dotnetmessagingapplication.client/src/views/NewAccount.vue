@@ -22,7 +22,7 @@
             create() {
                 // validate input
                 // create account
-                this.$router.push('home');
+                this.$router.push('user-id-example-2/home');
             }
         }
     });

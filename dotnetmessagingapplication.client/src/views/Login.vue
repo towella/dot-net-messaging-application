@@ -21,7 +21,7 @@
         methods: {
             login() {
                 // validate input
-                this.$router.push('home');
+                this.$router.push('user-id-example/home');
             }
         }
     });
