@@ -1,4 +1,5 @@
-﻿using DotNetMessagingApplication.Server.Services;
+﻿using DotNetMessagingApplication.Server.Dtos;
+using DotNetMessagingApplication.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetMessagingApplication.Server.Controllers;
@@ -12,9 +13,9 @@ public class LoginController(ILoginService loginService) : ControllerBase
 	[HttpPost("login")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public IActionResult Login([FromBody] string emailOrUsername, string password)
+	public IActionResult Login([FromBody] LoginRequest request)
 	{
-		if (_loginService.Login(emailOrUsername, password))
+		if (_loginService.Login(request.EmailOrUsername, request.Password))
 		{
 			return Ok("Login success!");
 		}
