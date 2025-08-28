@@ -37,14 +37,6 @@ public class UserRepository : Repository<User>
 
 	public void UpdateDetails(User updatedUser)
 	{
-		if (updatedUser == null) {
-			throw new ArgumentException("user object was null");
-		}
-
-		if (updatedUser.Username == null || updatedUser.Email == null || updatedUser.Password == null) {
-			throw new ArgumentException("required fields were null.");
-		}
-
 		Update(updatedUser);
 		SaveChanges();
 	}
