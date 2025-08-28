@@ -17,9 +17,9 @@ public class LoginController(ILoginService loginService) : ControllerBase
 	{
 		if (_loginService.Login(request.EmailOrUsername, request.Password))
 		{
-			return Ok("Login success!");
+			return Ok(new LoginResponse { Success = true, Message = "Logged in!"});
 		}
 
-		return NotFound("boooooooooooo");
+		return NotFound(new LoginResponse { Success = false, Message = "booooooooooooooooooooooooooooooo"});
 	}
 }
