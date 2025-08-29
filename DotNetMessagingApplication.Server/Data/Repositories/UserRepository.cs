@@ -18,6 +18,12 @@ public class UserRepository : Repository<User>
 		return MessagingAppContext.Users.SingleOrDefault(u => (u.Username == emailOrUsername || u.Email == emailOrUsername) && u.Password == password);
 	}
 
+	// only used after user logs in!
+	public User? GetUserByEmailOrUsername(string emailOrUsername)
+	{
+		return MessagingAppContext.Users.SingleOrDefault(u => u.Username == emailOrUsername || u.Email == emailOrUsername);
+	}
+
 	public void AddUser(string username, string email, string password)
 	{
 		if (UsernameAlreadyExists(username) || EmailAlreadyExists(email))
@@ -39,6 +45,34 @@ public class UserRepository : Repository<User>
 	{
 		Update(updatedUser);
 		SaveChanges();
+	}
+
+	public void SeedOneUserAndChild()
+	{
+		if (GetUserByEmailOrUsername("test") is null)
+		{
+			User user = new User
+			{
+				Username = "test",
+				Password = "test",
+				Email = "test@test.com"
+			};
+
+			Add(user);
+
+			if (GetUserByEmailOrUsername("child") is null)
+			{
+				Add(new Child
+				{
+					Username = "child",
+					Password = "child",
+					Email = "child@child.com",
+					Parent = user
+				});
+			}
+			
+			SaveChanges();
+		}
 	}
 
 	#endregion

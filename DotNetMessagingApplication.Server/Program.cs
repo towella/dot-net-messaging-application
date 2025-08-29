@@ -14,7 +14,8 @@ builder.Services.AddSwaggerGen();
 // add context, then repos, then services
 builder.Services.AddDbContext<MessagingAppContext>()
                 .AddScoped<UserRepository>()
-                .AddScoped<ILoginService, LoginService>();
+                .AddScoped<ILoginService, LoginService>()
+                .AddScoped<IAccountService, AccountService>();
 
 var app = builder.Build();
 
