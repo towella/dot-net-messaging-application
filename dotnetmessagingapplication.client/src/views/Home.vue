@@ -13,11 +13,11 @@
         },
         data() {
             return {
-                chatListTabSelected: "dm" as String,
+                chatListTabSelected: "dm",
                 chats: [{id: "id", name: "da boyz", messages: [{authorId: "author id", authorName: "Name", body: "message!!"}]},
                         {id: "asd", name: "pijins", messages: []}
                 ] as Array<types.Chat>,
-                selectedChatIndex: 0 as Number,
+                selectedChatIndex: 0,
             };
         },
 
@@ -27,19 +27,19 @@
         },
 
         methods: {
-            switchTab(tab: String) {
+            switchTab(tab: string) {
                 this.chatListTabSelected = tab;
                 // repopulate chats list with API call
                 this.chats = [];
             },
 
-            async changeChat(chatId: String) {
+            async changeChat(chatId: string) {
 
             },
 
             sendMessage() {
                 let messageInput: HTMLTextAreaElement | null = document.getElementById("message-input") as HTMLTextAreaElement | null;
-                let messageText: String = messageInput?.value ?? "";
+                let messageText: string = messageInput?.value ?? "";
                 console.log(messageText);
                 if (messageInput && messageText != "") {
                     this.chats[0].messages.push({

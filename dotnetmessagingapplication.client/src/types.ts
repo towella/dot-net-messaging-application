@@ -5,7 +5,7 @@ export interface Chat {
 }
 
 export interface Message {
-  authorId: String,
-  authorName: String,
-  body: String,
+  authorId: string,
+  authorName: string,
+  body: string,
 }
