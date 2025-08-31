@@ -19,7 +19,7 @@
 
 			return 0;
         }
-        public async Task DeleteMessage()
+        public async Task DeleteMessage(int messageId)
 		{
             // first get the conversation the logged in user wants to end a message
 

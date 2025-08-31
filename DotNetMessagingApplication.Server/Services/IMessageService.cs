@@ -4,9 +4,9 @@
     {
         // these might be subject to change...
         Task<int> CreateMessage();
-        Task<int> UpdateMessage();
+        Task<int> UpdateMessage(int messageId);
 
-        Task DeleteMessage();
+        Task DeleteMessage(int messageId);
 
         Task SendMessage();
         Task<int> GetUnreadMessages(int userId);
