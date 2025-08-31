@@ -30,7 +30,7 @@ namespace DotNetMessagingApplication.Server.Migrations
 
                     b.HasKey("ChatId");
 
-                    b.ToTable("Chat");
+                    b.ToTable("Chat", (string)null);
 
                     b.HasDiscriminator().HasValue("Chat");
 
@@ -52,7 +52,7 @@ namespace DotNetMessagingApplication.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GroupChatMember");
+                    b.ToTable("GroupChatMember", (string)null);
                 });
 
             modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.Message", b =>
@@ -85,7 +85,7 @@ namespace DotNetMessagingApplication.Server.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.Reaction", b =>
@@ -104,7 +104,7 @@ namespace DotNetMessagingApplication.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reactions");
+                    b.ToTable("Reactions", (string)null);
                 });
 
             modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.Relationship", b =>
@@ -122,7 +122,7 @@ namespace DotNetMessagingApplication.Server.Migrations
 
                     b.HasIndex("OtherPersonId");
 
-                    b.ToTable("Relationships");
+                    b.ToTable("Relationships", (string)null);
                 });
 
             modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.Settings", b =>
@@ -151,7 +151,7 @@ namespace DotNetMessagingApplication.Server.Migrations
                     b.HasIndex("SettingsId")
                         .IsUnique();
 
-                    b.ToTable("Settings");
+                    b.ToTable("Settings", (string)null);
                 });
 
             modelBuilder.Entity("DotNetMessagingApplication.Server.Data.Models.User", b =>
@@ -201,7 +201,7 @@ namespace DotNetMessagingApplication.Server.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasDiscriminator().HasValue("User");
 
