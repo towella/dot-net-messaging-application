@@ -2,7 +2,6 @@
 using DotNetMessagingApplication.Server.Dtos;
 using DotNetMessagingApplication.Server.Services;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace DotNetMessagingApplication.Server.Controllers;
 
@@ -11,6 +10,28 @@ namespace DotNetMessagingApplication.Server.Controllers;
 public class AccountController(IAccountService accountService) : ControllerBase
 {
 	readonly IAccountService _accountService = accountService;
+
+	[HttpPost("addUser")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public IActionResult AddNewUser([FromBody] AddNewUserRequest request)
+	{
+		try
+		{
+			_accountService.AddUser(request.Username, request.Email, request.Password, request.Pronouns);
+
+			return Ok("Successful sign up!");
+		}
+		catch (ArgumentException ex)
+		{
+			return UnprocessableEntity($"Could not sign up: {ex.Message}");
+		}
+		catch (Exception ex)
+		{
+			return BadRequest("Unhandled exception: " + ex.Message);
+		}
+	}
 
 	[HttpPost("details")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
@@ -39,5 +60,4 @@ public class AccountController(IAccountService accountService) : ControllerBase
 			return BadRequest("Unhandled exception: " + ex.Message);
 		}
 	}
-
 }
