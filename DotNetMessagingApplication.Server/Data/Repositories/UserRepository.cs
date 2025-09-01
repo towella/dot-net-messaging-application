@@ -24,7 +24,7 @@ public class UserRepository : Repository<User>
 		return MessagingAppContext.Users.SingleOrDefault(u => u.Username == emailOrUsername || u.Email == emailOrUsername);
 	}
 
-	public void AddUser(string username, string email, string password)
+	public void AddUser(string username, string email, string password, string pronouns)
 	{
 		if (UsernameAlreadyExists(username) || EmailAlreadyExists(email))
 		{
@@ -36,6 +36,7 @@ public class UserRepository : Repository<User>
 			Username = username,
 			Email = email,
 			Password = password,
+			Pronouns = pronouns,
 		});
 
 		SaveChanges();
@@ -82,12 +83,12 @@ public class UserRepository : Repository<User>
 
 	bool UsernameAlreadyExists(string username)
 	{
-		return MessagingAppContext.Users.Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+		return MessagingAppContext.Users.Any(u => u.Username == username);
 	}
 
 	bool EmailAlreadyExists(string email)
 	{
-		return MessagingAppContext.Users.Any(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+		return MessagingAppContext.Users.Any(u => u.Email == email);
 	}
 
 	#endregion

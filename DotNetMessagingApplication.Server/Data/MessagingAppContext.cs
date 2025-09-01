@@ -93,4 +93,9 @@ public class MessagingAppContext : DbContext
 			.WithMany(u => u.GroupChatMemberships)
 			.HasForeignKey(m => m.UserId);
 	}
+
+	protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+	{
+		configurationBuilder.Properties<string>().UseCollation("NOCASE");
+	}
 }
