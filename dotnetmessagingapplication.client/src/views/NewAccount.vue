@@ -17,11 +17,6 @@
             };
         },
 
-        // lifecycle hook (called on mount)
-        async mounted() {
-
-        },
-
         methods: {
             async create() {
                 if (!this.username || !this.password || !this.email || !this.pronouns) {
@@ -29,16 +24,21 @@
                     return
                 }
 
-                const validateExp = /[^a-zA-z0-9_.-]+/
+                const validateCredsExp = /[^a-zA-z0-9_.-]+/
+                const validateEmailExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\/.[a-zA-Z]{2,}$/
 
-                if (validateExp.test(this.username) || validateExp.test(this.password)) {
-                    this.errorMessage = 'Username or password contains invalid characters.'
+                if (validateCredsExp.test(this.password)) {
+                    this.errorMessage = 'Password contains invalid characters.'
                     return
                 }
-                // validate input
-                // create account
 
-                const response = await fetch('https://localhost:7157/api/controllers/addUser', {
+                if (this.username.includes('@') && validateEmailExp.test(this.username)) {
+                    this.errorMessage = 'Email is invalid'
+                } else if (validateCredsExp.test(this.username)) {
+                    this.errorMessage = 'Username contains invalid characters'
+                }
+
+                const response = await fetch('https://localhost:5223/api/controllers/addUser', {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json',
@@ -53,7 +53,7 @@
                 })
 
                 if (response.status === 200) {
-                    this.$router.push('user-id-example-2/home');
+                    this.$router.push(`${this.username}/home`);
                 }
                 else {
                     this.errorMessage = await response.text()

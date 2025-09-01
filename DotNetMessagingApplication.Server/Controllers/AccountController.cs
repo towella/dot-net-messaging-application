@@ -33,6 +33,33 @@ public class AccountController(IAccountService accountService) : ControllerBase
 		}
 	}
 
+	[HttpPost("updateUser")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public IActionResult UpdateUser([FromBody] UpdateUserRequest request)
+	{
+		try
+		{
+			User user = _accountService.GetDetails(request.oldUsername);
+			user.Username = request.Bio;
+			user.Password = request.Password;
+			user.Email = request.Email;
+			user.Pronouns = request.Pronouns;
+			user.Bio = request.Bio;
+
+			_accountService.UpdateDetails(user);
+			return Ok("Successful user update!");
+		}
+        catch (ArgumentException ex)
+        {
+            return BadRequest("No user with the given user and email could be found: " + ex.Message);
+        }
+        catch (Exception ex)
+		{
+			return BadRequest("Unhandled exception: " + ex.Message);
+		}
+	}
+
 	[HttpPost("details")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	public IActionResult GetAccountDetails([FromBody] AccountDetailsRequest request)
