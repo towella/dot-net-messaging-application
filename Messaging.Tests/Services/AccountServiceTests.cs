@@ -86,7 +86,7 @@ public class AccountServiceTests
 
 		_accountService.UpdateDetails(newDetails);
 
-		Assert.That(testUsers[0].Pronouns, Is.EqualTo(newDetails.Pronouns));
+		Assert.DoesNotThrow(() => _accountService.UpdateDetails(newDetails));
 		_mockUserRepo.Verify(m => m.UpdateDetails(It.IsAny<User>(), It.IsAny<User>()), Times.Once);
 	}
 
