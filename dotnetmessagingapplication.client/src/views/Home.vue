@@ -23,7 +23,7 @@
 
         // lifecycle hook (called on mount)
         async mounted() {
-
+            
         },
 
         methods: {
@@ -43,8 +43,8 @@
                 console.log(messageText);
                 if (messageInput && messageText != "") {
                     this.chats[0].messages.push({
-                        authorId: this.$route.params.id,
-                        authorName: "Name",
+                        authorId: "",
+                        authorName: this.$route.params.username,
                         body: messageText,
                     } as types.Message);
                     messageInput.value = "";

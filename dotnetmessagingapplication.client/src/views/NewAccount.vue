@@ -38,7 +38,7 @@
                     this.errorMessage = 'Username contains invalid characters'
                 }
 
-                const response = await fetch('https://localhost:5223/api/controllers/addUser', {
+                const response = await fetch('https://localhost:7157/api/controllers/addUser', {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json',
