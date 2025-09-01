@@ -60,7 +60,7 @@
         <div id="settings-buttons">
             <!-- <input type="image" src="https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png"></input> -->
             <RouterLink :to="{name: 'Settings'}"><img src="../assets/icons/settings.png" style="width: 40px;" /></RouterLink>
-            <RouterLink :to="{name: 'Account'}">Account</RouterLink>
+            <RouterLink :to="{name: 'Account'}"><img id="profile-picture" src="https://i.insider.com/602ee9ced3ad27001837f2ac?width=700"></img></RouterLink>
         </div>
     </div>
 
@@ -136,6 +136,13 @@
         display: flex;
         align-items: center;
         margin-right: 2%;
+    }
+
+    #profile-picture {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: white 3px solid;
     }
 
     #body-content {
