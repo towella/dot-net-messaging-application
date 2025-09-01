@@ -8,9 +8,9 @@ public interface ILoginService
 	bool Login(string emailOrUsername, string password);
 }
 
-public class LoginService(UserRepository userRepo) : ILoginService
+public class LoginService(IUserRepository userRepo) : ILoginService
 {
-	readonly UserRepository _userRepo = userRepo;
+	readonly IUserRepository _userRepo = userRepo;
 
 	public bool Login(string emailOrUsername, string password)
 	{

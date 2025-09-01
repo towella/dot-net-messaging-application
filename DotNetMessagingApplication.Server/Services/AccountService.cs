@@ -13,9 +13,9 @@ public interface IAccountService
 	User GetDetails(string emailOrPassword);
 }
 
-public class AccountService(UserRepository userRepo) : IAccountService
+public class AccountService(IUserRepository userRepo) : IAccountService
 {
-	readonly UserRepository _userRepo = userRepo;
+	readonly IUserRepository _userRepo = userRepo;
 
 	public void AddUser(string username, string email, string password, string pronouns)
 	{
