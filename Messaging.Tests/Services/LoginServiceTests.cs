@@ -15,7 +15,6 @@ public class LoginServiceTests
 	public void Setup()
 	{
 		_mockUserRepo = new Mock<IUserRepository>();
-		_loginService = new LoginService(_mockUserRepo.Object);
 
 		User testUser = new User
 		{
@@ -24,9 +23,11 @@ public class LoginServiceTests
 			Email = "test@test.com",
 		};
 
-		_mockUserRepo.Setup(m => m.GetUserByPasswordAndEmailOrUsername(It.Is<string>(x => x == "test" || x == "test@test.com"), 
+		_mockUserRepo.Setup(m => m.GetUserByPasswordAndEmailOrUsername(It.Is<string>(x => x == "test" || x == "test@test.com"),
 																		It.Is<string>(x => x == "password")))
 															.Returns(testUser);
+		
+		_loginService = new LoginService(_mockUserRepo.Object);
 	}
 
 	[TestCase("test", "password")]
