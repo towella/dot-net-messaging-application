@@ -35,21 +35,79 @@ public class AccountServiceTests
 							Pronouns = pr
 						}));
 
+		_mockUserRepo.Setup(m => m.UpdateDetails(It.IsAny<User>(), It.IsAny<User>())).Callback<User, User>((o, n) =>
+		{
+			o.Username = n.Username;
+			o.Email = n.Email;
+			o.Password = n.Password;
+			o.Pronouns = n.Pronouns;
+			o.Phone = n.Phone;
+			o.Bio = n.Bio;
+		});
+
 		_accountService = new AccountService(_mockUserRepo.Object);
 	}
+
+	#region AddUser
 
 	[Test]
 	public void AddUser_WhenEmailIsInvalid_ThrowsException()
 	{
-		var exception = Assert.Throws<ArgumentException>(() => _accountService.AddUser("u", "invalid", "p", "pr"));
+		ArgumentException exception = Assert.Throws<ArgumentException>(() => _accountService.AddUser("u", "invalid", "p", "pr"));
 		Assert.That(exception.Message, Is.EqualTo("Email was invalid."));
 	}
 
 	[Test]
 	public void AddUser_WhenDetailsAreValid_Success()
 	{
-		var userCount = testUsers.Count;
+		int userCount = testUsers.Count;
 		Assert.DoesNotThrow(() => _accountService.AddUser("u", "test@email.com", "pw", "pr"));
 		Assert.That(testUsers, Has.Count.EqualTo(userCount + 1));
 	}
+
+	#endregion
+
+
+	#region UpdateDetails
+
+	[Test]
+	public void UpdateDetails_WhenValidDetails_Success()
+	{
+		_mockUserRepo.Setup(m => m.GetUserByEmailOrUsername(It.Is<string>(x => x == "test" || x == "test@test.com"))).Returns(testUsers[0]);
+		_mockUserRepo.Setup(m => m.UpdateDetails(It.IsAny<User>(), It.IsAny<User>())).Verifiable();
+
+		User newDetails = new User()
+		{
+			Username = testUsers[0].Username,
+			Password = testUsers[0].Password,
+			Email = testUsers[0].Email,
+			Pronouns = "she/her",
+		};
+
+		_accountService.UpdateDetails(newDetails);
+
+		Assert.That(testUsers[0].Pronouns, Is.EqualTo(newDetails.Pronouns));
+		_mockUserRepo.Verify(m => m.UpdateDetails(It.IsAny<User>(), It.IsAny<User>()), Times.Once);
+	}
+
+	[TestCase("test", null, "new@email.com", "she/her", "Password is empty.", Description = "Empty password check")]
+	[TestCase("test", "newPassword", null, "she/her", "Email is empty.", Description = "Empty email check")]
+	[TestCase("test", "newPassword", "invalid email", "she/her", "Email is invalid.", Description = "Invalid email check")]
+	public void UpdateDetails_WhenInvalidDetails_ThrowsArgumentException(string? username, string? password, string? email, string? pronouns, string expectedMessage)
+	{
+		_mockUserRepo.Setup(m => m.GetUserByEmailOrUsername(It.Is<string>(x => x == "test" || x == "test@test.com"))).Returns(testUsers[0]);
+
+		User newDetails = new User()
+		{
+			Username = username ?? "newUsername",
+			Password = password! ,
+			Email = email!,
+			Pronouns = pronouns,
+		};
+
+		ArgumentException ex = Assert.Throws<ArgumentException>(() => _accountService.UpdateDetails(newDetails));
+		Assert.That(ex.Message, Is.EqualTo(expectedMessage));
+	}
+
+	#endregion
 }
