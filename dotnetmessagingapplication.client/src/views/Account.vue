@@ -14,7 +14,27 @@
 
         // lifecycle hook (called on mount)
         async mounted() {
+            const response = await fetch('https://localhost:7157/api/controllers/details', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ emailOrUsername: this.$props.id})
+            })
+            .then(r => r.json())
 
+            const profileImage = document.getElementById('profile-picture')! as HTMLImageElement;
+            const usernameInput = document.getElementById('username')! as HTMLInputElement;
+            const emailInput = document.getElementById('email')! as HTMLInputElement;
+            const phoneInput = document.getElementById('phone')! as HTMLInputElement;
+            const pronounsInput = document.getElementById('pronouns')! as HTMLInputElement;
+            const bioInput = document.getElementById('bio')! as HTMLInputElement;
+            profileImage.src = "https://i.insider.com/602ee9ced3ad27001837f2ac?width=700";
+            usernameInput.value = response.username;
+            emailInput.value = response.email;
+            phoneInput.value = response.phone;
+            pronounsInput.value = response.pronouns;
+            bioInput.value = response.bio;
         },
 
         methods: {
@@ -39,7 +59,7 @@
 
         <Widget id="account-body">
             <div class="account-item" style="display: flex; justify-content: center; padding-right: 10px;">
-                <img id="profile-picture" src="https://i.insider.com/602ee9ced3ad27001837f2ac?width=700"></img>
+                <img id="profile-picture"></img>
             </div>
 
             <div class="account-item">
