@@ -113,8 +113,6 @@ public class AccountController(IAccountService accountService) : ControllerBase
             return "Username contains invalid characters";
         }
 
-		Console.WriteLine(email);
-		Console.WriteLine(validateEmailExp.IsMatch(email));
         if (!validateEmailExp.IsMatch(email)) {
 			return "Email is invalid";
 		}
