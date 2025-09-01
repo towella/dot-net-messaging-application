@@ -8,7 +8,7 @@
     export default defineComponent({
         data() {
             return {
-
+                errorMessage: "",
             };
         },
 
@@ -49,22 +49,33 @@
                 const phoneInput = document.getElementById('phone')! as HTMLInputElement;
                 const pronounsInput = document.getElementById('pronouns')! as HTMLInputElement;
                 const bioInput = document.getElementById('bio')! as HTMLInputElement;
-
-                const response = await fetch('https://localhost:7157/api/controllers/updateUser', {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        oldUsername: this.$route.params.username,
-                        username: usernameInput.value,
-                        email: emailInput.value,
-                        phone: phoneInput.value,
-                        pronouns: pronounsInput.value,
-                        bio: bioInput.value,
+                    
+                if (!usernameInput.value || !emailInput.value || !phoneInput.value || !pronounsInput || !bioInput) {
+                    this.errorMessage = "All fields must be filled to save";
+                } else {
+                    this.errorMessage = "";
+                    console.log(emailInput.value);
+                    const response = await fetch('https://localhost:7157/api/controllers/updateUser', {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            oldUsername: this.$route.params.username,
+                            username: usernameInput.value,
+                            email: emailInput.value,
+                            phone: phoneInput.value,
+                            pronouns: pronounsInput.value,
+                            bio: bioInput.value,
+                        })
                     })
-                })
-                this.returnHome();
+
+                    if (response.status === 200) {
+                        this.returnHome();
+                    } else {
+                        this.errorMessage = await response.text()
+                    }
+                }
             },
         }
     });
@@ -110,6 +121,7 @@
 
             <div class="account-item">
                 <button v-on:click="saveChanges()" style="margin: 0;">Save Changes</button>
+                <p id="errorMessage" :innerText="errorMessage"></p>
             </div>
         </Widget>
     </div>
@@ -162,5 +174,9 @@
 
     #bio {
         width: 94%;
+    }
+
+    #errorMessage {
+        color: var(--destructiveColour);
     }
 </style>

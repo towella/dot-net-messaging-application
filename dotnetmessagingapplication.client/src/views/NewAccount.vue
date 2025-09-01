@@ -24,20 +24,6 @@
                     return
                 }
 
-                const validateCredsExp = /[^a-zA-z0-9_.-]+/
-                const validateEmailExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\/.[a-zA-Z]{2,}$/
-
-                if (validateCredsExp.test(this.password)) {
-                    this.errorMessage = 'Password contains invalid characters.'
-                    return
-                }
-
-                if (this.username.includes('@') && validateEmailExp.test(this.username)) {
-                    this.errorMessage = 'Email is invalid'
-                } else if (validateCredsExp.test(this.username)) {
-                    this.errorMessage = 'Username contains invalid characters'
-                }
-
                 const response = await fetch('https://localhost:7157/api/controllers/addUser', {
                     method: "POST",
                     headers: {
