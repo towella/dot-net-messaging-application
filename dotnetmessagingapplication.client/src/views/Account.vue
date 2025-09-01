@@ -19,7 +19,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ emailOrUsername: this.$props.id})
+                body: JSON.stringify({ emailOrUsername: this.$route.params.username})
             })
             .then(r => r.json())
 
@@ -42,7 +42,28 @@
                 this.$router.push('home');
             },
 
-            saveChanges() {
+            async saveChanges() {
+                const profileImage = document.getElementById('profile-picture')! as HTMLImageElement;
+                const usernameInput = document.getElementById('username')! as HTMLInputElement;
+                const emailInput = document.getElementById('email')! as HTMLInputElement;
+                const phoneInput = document.getElementById('phone')! as HTMLInputElement;
+                const pronounsInput = document.getElementById('pronouns')! as HTMLInputElement;
+                const bioInput = document.getElementById('bio')! as HTMLInputElement;
+
+                const response = await fetch('https://localhost:7157/api/controllers/updateUser', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        oldUsername: this.$route.params.username,
+                        username: usernameInput.value,
+                        email: emailInput.value,
+                        phone: phoneInput.value,
+                        pronouns: pronounsInput.value,
+                        bio: bioInput.value,
+                    })
+                })
                 this.returnHome();
             },
         }

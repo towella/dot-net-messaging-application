@@ -41,9 +41,9 @@ public class AccountController(IAccountService accountService) : ControllerBase
 		try
 		{
 			User user = _accountService.GetDetails(request.oldUsername);
-			user.Username = request.Bio;
-			user.Password = request.Password;
+			user.Username = request.Username;
 			user.Email = request.Email;
+			user.Phone = request.Phone;
 			user.Pronouns = request.Pronouns;
 			user.Bio = request.Bio;
 

@@ -23,7 +23,7 @@
 
         // lifecycle hook (called on mount)
         async mounted() {
-            
+
         },
 
         methods: {
@@ -101,7 +101,7 @@
             <div id="chat-window">
                 <MessageBubble v-if="chats[selectedChatIndex]?.messages.length > 0" 
                     v-for="m in chats[selectedChatIndex]?.messages"
-                    :sender="m.authorName" :body="m.body" :external-message="m.authorId != $route.params.id"></MessageBubble>
+                    :sender="m.authorName" :body="m.body" :external-message="m.authorName != $route.params.username"></MessageBubble>
                 <p v-else style="align-self: center;">No one has said anything yet. Start the conversation!</p>
             </div>
 
