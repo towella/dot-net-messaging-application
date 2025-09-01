@@ -8,22 +8,28 @@
     import * as types from '../types.ts'
 
     export default defineComponent({
-        props: {
-            id: String,
-        },
         data() {
             return {
                 chatListTabSelected: "dm",
-                chats: [{id: "id", name: "da boyz", messages: [{authorId: "author id", authorName: "Name", body: "message!!"}]},
-                        {id: "asd", name: "pijins", messages: []}
+                chats: [{id: 32, name: "da boyz", messages: [{authorId: 45, authorName: "Name", body: "message!!"}]},
+                        {id: 60, name: "pijins", messages: []}
                 ] as Array<types.Chat>,
                 selectedChatIndex: 0,
+                id: -1,
             };
         },
 
         // lifecycle hook (called on mount)
         async mounted() {
-
+            const response = await fetch('https://localhost:7157/api/controllers/details', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ emailOrUsername: this.$route.params.username})
+            })
+            .then(r => r.json())
+            this.id = response.id;
         },
 
         methods: {
@@ -43,8 +49,8 @@
                 console.log(messageText);
                 if (messageInput && messageText != "") {
                     this.chats[0].messages.push({
-                        authorId: this.$route.params.id,
-                        authorName: "Name",
+                        authorId: this.id,
+                        authorName: this.$route.params.username,
                         body: messageText,
                     } as types.Message);
                     messageInput.value = "";
@@ -60,7 +66,7 @@
         <div id="settings-buttons">
             <!-- <input type="image" src="https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png"></input> -->
             <RouterLink :to="{name: 'Settings'}"><img src="../assets/icons/settings.png" style="width: 40px;" /></RouterLink>
-            <RouterLink :to="{name: 'Account'}">Account</RouterLink>
+            <RouterLink :to="{name: 'Account'}"><img id="profile-picture" src="https://i.insider.com/602ee9ced3ad27001837f2ac?width=700"></img></RouterLink>
         </div>
     </div>
 
@@ -101,7 +107,7 @@
             <div id="chat-window">
                 <MessageBubble v-if="chats[selectedChatIndex]?.messages.length > 0" 
                     v-for="m in chats[selectedChatIndex]?.messages"
-                    :sender="m.authorName" :body="m.body" :external-message="m.authorId != $route.params.id"></MessageBubble>
+                    :sender="m.authorName" :body="m.body" :external-message="m.authorName != $route.params.username"></MessageBubble>
                 <p v-else style="align-self: center;">No one has said anything yet. Start the conversation!</p>
             </div>
 
@@ -136,6 +142,13 @@
         display: flex;
         align-items: center;
         margin-right: 2%;
+    }
+
+    #profile-picture {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: white 3px solid;
     }
 
     #body-content {

@@ -10,7 +10,7 @@ public interface IAccountService
 
 	void UpdateDetails(User user);
 
-	User GetDetails(string emailOrPassword);
+	User GetDetails(string emailOrUsername);
 }
 
 public class AccountService(UserRepository userRepo) : IAccountService
@@ -32,13 +32,13 @@ public class AccountService(UserRepository userRepo) : IAccountService
 		_userRepo.UpdateDetails(user);
 	}
 
-	public User GetDetails(string emailOrPassword)
+	public User GetDetails(string emailOrUsername)
 	{
 		// seeding, temporary for testing
 		_userRepo.SeedOneUserAndChild();
 
 
-		User? user = _userRepo.GetUserByEmailOrUsername(emailOrPassword);
+		User? user = _userRepo.GetUserByEmailOrUsername(emailOrUsername);
 
 		if (user is null)
 		{
