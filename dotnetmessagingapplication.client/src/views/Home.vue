@@ -8,22 +8,28 @@
     import * as types from '../types.ts'
 
     export default defineComponent({
-        props: {
-            id: String,
-        },
         data() {
             return {
                 chatListTabSelected: "dm",
-                chats: [{id: "id", name: "da boyz", messages: [{authorId: "author id", authorName: "Name", body: "message!!"}]},
-                        {id: "asd", name: "pijins", messages: []}
+                chats: [{id: 32, name: "da boyz", messages: [{authorId: 45, authorName: "Name", body: "message!!"}]},
+                        {id: 60, name: "pijins", messages: []}
                 ] as Array<types.Chat>,
                 selectedChatIndex: 0,
+                id: -1,
             };
         },
 
         // lifecycle hook (called on mount)
         async mounted() {
-
+            const response = await fetch('https://localhost:7157/api/controllers/details', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ emailOrUsername: this.$route.params.username})
+            })
+            .then(r => r.json())
+            this.id = response.id;
         },
 
         methods: {
@@ -43,7 +49,7 @@
                 console.log(messageText);
                 if (messageInput && messageText != "") {
                     this.chats[0].messages.push({
-                        authorId: "",
+                        authorId: this.id,
                         authorName: this.$route.params.username,
                         body: messageText,
                     } as types.Message);

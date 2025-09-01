@@ -70,6 +70,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
 
 			return Ok(new AccountDetailsResponse
 			{
+				Id = user.Id,
 				Username = user.Username,
 				Email = user.Email,
 				Phone = user.Phone,
