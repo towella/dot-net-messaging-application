@@ -5,21 +5,21 @@ namespace DotNetMessagingApplication.Server.Data;
 
 public class MessagingAppContext : DbContext
 {
-	public DbSet<Child> Children { get; set; }
+	public virtual DbSet<Child> Children { get; set; }
 
-	public DbSet<DirectMessage> DirectMessages { get; set; }
+	public virtual DbSet<DirectMessage> DirectMessages { get; set; }
 
-	public DbSet<GroupChat> GroupChats { get; set; }
+	public virtual DbSet<GroupChat> GroupChats { get; set; }
 
-	public DbSet<Message> Messages { get; set; }
+	public virtual DbSet<Message> Messages { get; set; }
 
-	public DbSet<Reaction> Reactions { get; set; }
+	public virtual DbSet<Reaction> Reactions { get; set; }
 
-	public DbSet<Relationship> Relationships { get; set; }
+	public virtual DbSet<Relationship> Relationships { get; set; }
 
-	public DbSet<Settings> Settings { get; set; }
+	public virtual DbSet<Settings> Settings { get; set; }
 
-	public DbSet<User> Users { get; set; }
+	public virtual DbSet<User> Users { get; set; }
 
 	readonly string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "messaging.db");
 

@@ -13,13 +13,13 @@ public interface IAccountService
 	User GetDetails(string emailOrUsername);
 }
 
-public class AccountService(UserRepository userRepo) : IAccountService
+public class AccountService(IUserRepository userRepo) : IAccountService
 {
-	readonly UserRepository _userRepo = userRepo;
+	readonly IUserRepository _userRepo = userRepo;
 
 	public void AddUser(string username, string email, string password, string pronouns)
 	{
-		if (!MailAddress.TryCreate(email, out var _))
+		if (!MailAddress.TryCreate(email, out _))
 		{
 			throw new ArgumentException("Email was invalid.");
 		}
@@ -37,14 +37,7 @@ public class AccountService(UserRepository userRepo) : IAccountService
 		// seeding, temporary for testing
 		_userRepo.SeedOneUserAndChild();
 
-
-		User? user = _userRepo.GetUserByEmailOrUsername(emailOrUsername);
-
-		if (user is null)
-		{
-			throw new InvalidOperationException("User does not exist.");
-		}
-
+		User? user = _userRepo.GetUserByEmailOrUsername(emailOrUsername) ?? throw new InvalidOperationException("User does not exist.");
 		return user;
 	}
 }
