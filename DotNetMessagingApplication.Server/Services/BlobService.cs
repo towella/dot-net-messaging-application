@@ -15,7 +15,7 @@ namespace DotNetMessagingApplication.Server.Services
 			_blobContainerClient = new BlobContainerClient(connectionString, containerName);
 		}
 
-		public async Task<string> UploadImageAsync(IFormFile file)
+		public async Task<string> UploadImage(IFormFile file)
 		{
 			var blobName = Guid.NewGuid() + Path.GetExtension(file.FileName);
 			var blobClient = _blobContainerClient.GetBlobClient(blobName);
@@ -25,10 +25,20 @@ namespace DotNetMessagingApplication.Server.Services
 
 			return blobClient.Uri.ToString();
 		}
-        public async Task<bool> DeleteBlobAsync(string blobName)
+        public async Task<bool> DeleteBlob(string blobName)
         {
             var blobClient = _blobContainerClient.GetBlobClient(blobName);
             return await blobClient.DeleteIfExistsAsync();
+        }
+        public async Task<Stream?> GetImage(string blobName)
+        {
+            var blobClient = _blobContainerClient.GetBlobClient(blobName);
+
+            if (!await blobClient.ExistsAsync())
+                return null;
+
+            var downloadInfo = await blobClient.DownloadAsync();
+            return downloadInfo.Value.Content;
         }
     }
 }

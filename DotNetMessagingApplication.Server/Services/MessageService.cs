@@ -13,18 +13,8 @@ namespace DotNetMessagingApplication.Server.Services
 			_blobService = blobService;
         }
 
-		public async Task<int> SendMessage(Message message)
-		{
-			return await _messageRepository.AddMessage(message);
-		}
-        public async Task<int> SendMessage(Message message, IFormFile imageFile)
+        public async Task<int> SendMessage(Message message)
         {
-            if (imageFile != null && imageFile.Length > 0)
-            {
-                var imageUrl = await _blobService.UploadImageAsync(imageFile);
-                message.ImageUrl = imageUrl;
-            }
-
             return await _messageRepository.AddMessage(message);
         }
 
@@ -60,7 +50,7 @@ namespace DotNetMessagingApplication.Server.Services
 
 				if (!string.IsNullOrEmpty(message.Result!.ImageUrl))
 				{
-					await _blobService.DeleteImageAsync(message.Result.ImageUrl);
+					await _blobService.DeleteBlob(message.Result.ImageUrl);
                 }
                 return await _messageRepository.DeleteMessage(messageId);
 			}

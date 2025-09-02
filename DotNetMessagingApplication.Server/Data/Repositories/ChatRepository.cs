@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotNetMessagingApplication.Server.Data.Repositories
 {
-	public class ChatRepository : IChatRepository
+	public class ChatRepository
 	{
 		private readonly MessagingAppContext _context;
 
