@@ -8,5 +8,6 @@ namespace DotNetMessagingApplication.Server.Services
 		Task<int> UpdateMessage(int messageId, string content);
 		Task<int> DeleteMessage(int messageId);
 		Task<int> SendMessage(Message message);
+		Task<int> SendMessage(Message messgae, IFormFile imageFile);
 	}
 }

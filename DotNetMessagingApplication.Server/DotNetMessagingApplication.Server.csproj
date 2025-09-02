@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.25.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy">
       <Version>8.*-*</Version>
     </PackageReference>
@@ -22,6 +23,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
+
+	<PropertyGroup>
+		<UserSecretsId>dotnet-messaging-app-secrets</UserSecretsId>
+	</PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\dotnetmessagingapplication.client\dotnetmessagingapplication.client.esproj">
