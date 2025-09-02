@@ -43,6 +43,6 @@ public class Repository<T> : IRepository<T> where T : class
 
 	public void Update(T entity)
 	{
-		_context.Update(entity);
+		_context.Set<T>().Update(entity);
 	}
 }

@@ -29,7 +29,7 @@
                 }
 
                 const response = await fetch('https://localhost:7157/api/controllers/login', {
-                    method: "POST",
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },

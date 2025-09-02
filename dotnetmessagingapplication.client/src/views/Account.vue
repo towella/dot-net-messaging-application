@@ -56,7 +56,7 @@
                     this.errorMessage = "";
                     console.log(emailInput.value);
                     const response = await fetch('https://localhost:7157/api/controllers/updateUser', {
-                        method: "POST",
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },

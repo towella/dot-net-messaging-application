@@ -3,7 +3,20 @@ using DotNetMessagingApplication.Server.Data.Repositories.Base;
 
 namespace DotNetMessagingApplication.Server.Data.Repositories;
 
-public class UserRepository : Repository<User>
+public interface IUserRepository : IRepository<User>
+{
+	User? GetUserByPasswordAndEmailOrUsername(string emailOrUsername, string password);
+
+	User? GetUserByEmailOrUsername(string emailOrUsername);
+
+	void AddUser(string username, string email, string password, string pronouns);
+
+	void UpdateDetails(User user);
+	
+	void SeedOneUserAndChild();
+}
+
+public class UserRepository : Repository<User>, IUserRepository
 {
 	public UserRepository(MessagingAppContext context) : base(context)
 	{
@@ -42,9 +55,9 @@ public class UserRepository : Repository<User>
 		SaveChanges();
 	}
 
-	public void UpdateDetails(User updatedUser)
+	public void UpdateDetails(User user)
 	{
-		Update(updatedUser);
+		Update(user);
 		SaveChanges();
 	}
 
@@ -71,7 +84,7 @@ public class UserRepository : Repository<User>
 					Parent = user
 				});
 			}
-			
+
 			SaveChanges();
 		}
 	}
