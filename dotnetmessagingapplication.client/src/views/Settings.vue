@@ -20,7 +20,11 @@
         methods: {
             returnHome() {
                 this.$router.push('home');
-            }
+            },
+
+            saveChanges() {
+                this.returnHome()
+            },
         }
     });
 </script>
@@ -64,6 +68,10 @@
                     <option value="dark">Dark</option>
                     <option value="light">Light</option>
                 </select>
+            </div>
+
+            <div class="account-item">
+                <button v-on:click="saveChanges()" style="margin: 0; margin-top: 10px;">Save Changes</button>
             </div>
         </Widget>
     </div>

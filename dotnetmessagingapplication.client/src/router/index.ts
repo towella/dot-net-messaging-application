@@ -19,18 +19,18 @@ const routes = [
     component: NewAccount
 },
 {
-    path: `${rootPath}/:id/home`,
+    path: `${rootPath}/:username/home`,
     name: 'Home',
     component: Home,
     props: true,
 },
 {
-    path: `${rootPath}/:id/settings`,
+    path: `${rootPath}/:username/settings`,
     name: 'Settings',
     component: Settings
 },
 {
-    path: `${rootPath}/:id/account`,
+    path: `${rootPath}/:username/account`,
     name: 'Account',
     component: Account
 },
