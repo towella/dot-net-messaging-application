@@ -8,14 +8,19 @@
     export default defineComponent({
         data() {
             return {
-                errorMessage: "",
+                errorMessage: '',
+                newUsername: '',
+                newEmail: '',
+                newPhone: '',
+                newPronouns: '',
+                newBio: ''
             };
         },
 
         // lifecycle hook (called on mount)
         async mounted() {
             const response = await fetch('https://localhost:7157/api/controllers/details', {
-                method: "POST",
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -24,17 +29,13 @@
             .then(r => r.json())
 
             const profileImage = document.getElementById('profile-picture')! as HTMLImageElement;
-            const usernameInput = document.getElementById('username')! as HTMLInputElement;
-            const emailInput = document.getElementById('email')! as HTMLInputElement;
-            const phoneInput = document.getElementById('phone')! as HTMLInputElement;
-            const pronounsInput = document.getElementById('pronouns')! as HTMLInputElement;
-            const bioInput = document.getElementById('bio')! as HTMLInputElement;
             profileImage.src = "https://i.insider.com/602ee9ced3ad27001837f2ac?width=700";
-            usernameInput.value = response.username;
-            emailInput.value = response.email;
-            phoneInput.value = response.phone;
-            pronounsInput.value = response.pronouns;
-            bioInput.value = response.bio;
+
+            this.newUsername = response.username;
+            this.newEmail = response.email;
+            this.newPhone = response.phone;
+            this.newPronouns = response.pronouns;
+            this.newBio = response.bio;
         },
 
         methods: {
@@ -42,19 +43,11 @@
                 this.$router.push('home');
             },
 
-            async saveChanges() {
-                const profileImage = document.getElementById('profile-picture')! as HTMLImageElement;
-                const usernameInput = document.getElementById('username')! as HTMLInputElement;
-                const emailInput = document.getElementById('email')! as HTMLInputElement;
-                const phoneInput = document.getElementById('phone')! as HTMLInputElement;
-                const pronounsInput = document.getElementById('pronouns')! as HTMLInputElement;
-                const bioInput = document.getElementById('bio')! as HTMLInputElement;
-                    
-                if (!usernameInput.value || !emailInput.value || !phoneInput.value || !pronounsInput || !bioInput) {
-                    this.errorMessage = "All fields must be filled to save";
+            async saveChanges() {                   
+                if (!this.newUsername || !this.newEmail || !this.newPhone || !this.newPronouns || !this.newBio) {
+                    this.errorMessage = 'All fields must be filled to save';
                 } else {
-                    this.errorMessage = "";
-                    console.log(emailInput.value);
+                    this.errorMessage = '';
                     const response = await fetch('https://localhost:7157/api/controllers/updateUser', {
                         method: 'POST',
                         headers: {
@@ -62,11 +55,11 @@
                         },
                         body: JSON.stringify({ 
                             oldUsername: this.$route.params.username,
-                            username: usernameInput.value,
-                            email: emailInput.value,
-                            phone: phoneInput.value,
-                            pronouns: pronounsInput.value,
-                            bio: bioInput.value,
+                            username: this.newUsername,
+                            email: this.newEmail,
+                            phone: this.newPhone,
+                            pronouns: this.newPronouns,
+                            bio: this.newBio,
                         })
                     })
 
@@ -96,27 +89,27 @@
 
             <div class="account-item">
                 <label for="username">Username: </label>
-                <input id="username" placeholder="Username..."/>
+                <input v-model="newUsername" id="username" placeholder="Username..."/>
             </div>
 
             <div class="account-item">
                 <label for="email">Email: </label>
-                <input id="email" type="email" placeholder="Email..."/>
+                <input v-model="newEmail" id="email" type="email" placeholder="Email..."/>
             </div>
 
             <div class="account-item">
                 <label for="phone">Phone: </label>
-                <input id="phone" type="number" placeholder="Phone..."/>
+                <input v-model="newPhone" id="phone" type="number" placeholder="Phone..."/>
             </div>
 
             <div class="account-item">
                 <label for="pronouns">Pronouns: </label>
-                <input id="pronouns" placeholder="They/Them/Theirs..."/>
+                <input v-model="newPronouns" id="pronouns" placeholder="They/Them/Theirs..."/>
             </div>
 
             <div class="account-item">
                 <p for="bio" style="margin-bottom:0;">Bio</p>
-                <textarea id="bio" placeholder="Bio..."></textarea>
+                <textarea v-model="newBio" id="bio" placeholder="Bio..."></textarea>
             </div>
 
             <div class="account-item">
