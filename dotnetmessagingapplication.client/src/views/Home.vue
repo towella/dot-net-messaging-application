@@ -42,36 +42,87 @@
                     chat.messages.push(message);
                 }
             });
+            signalrService.onMessageEdited((messageId, newContent) => {
+                for (const chat of this.chats) {
+                    const msg = chat.messages.find(m => m.id === messageId);
+                    if (msg) msg.body = newContent;
+                }
+            });
+            signalrService.onMessageDeleted((messageId) => {
+                for (const chat of this.chats) {
+                    const idx = chat.messages.findIndex(m => m.id === messageId);
+                    if (idx !== -1) chat.messages.splice(idx, 1);
+                }
+            });
+            signalrService.onChatCreated((chatName) => {
+                // Optionally fetch new chats or add to list
+            });
+            signalrService.onChatDeleted((chatId) => {
+                const idx = this.chats.findIndex(c => c.id === chatId);
+                if (idx !== -1) this.chats.splice(idx, 1);
+            });
+            // Listen for chats received from SignalR
+            if (signalrService.connection) {
+                signalrService.connection.on("ReceiveChats", (chats) => {
+                    this.chats = chats;
+                    this.selectedChatIndex = 0;
+                });
+            }
+            // Optionally, load DMs by default
+            await this.fetchChats("dm");
         },
 
         methods: {
-            switchTab(tab: string) {
-                this.chatListTabSelected = tab;
-                // repopulate chats list with API call
-                this.chats = [];
-            },
-
             async changeChat(chatId: string) {
 
             },
-
             async sendMessage() {
-                let messageInput: HTMLTextAreaElement | null = document.getElementById("message-input") as HTMLTextAreaElement | null;
-                let messageText: string = messageInput?.value ?? "";
-                if (messageInput && messageText != "") {
-                    this.chats[0].messages.push({
+                const messageInput = document.getElementById("message-input") as HTMLTextAreaElement | null;
+                const messageText = messageInput?.value ?? "";
+
+                if (messageInput && messageText !== "") {
+                    const chat = this.chats[0];
+                    const message: types.Message = {
                         authorId: this.id,
                         authorName: this.$route.params.username,
                         body: messageText,
-                        chatId: chat.id // Add chatId property if not present in Message type
                     };
-                    // Send via SignalR
-                    await signalrService.sendMessage(chat.id, message);
-                    // Optionally, add to local state for instant feedback
+
                     chat.messages.push(message);
                     messageInput.value = "";
+
+                    await signalrService.sendMessage({
+                        chatId: chat.id,
+                        message: messageText,
+                        senderId: this.id
+                    });
                 }
-            }
+            },
+
+            async editMessage(messageId: number, newContent: string) {
+                await signalrService.editMessage({ messageId, newMessage: newContent });
+            },
+            async deleteMessage(messageId: number) {
+                await signalrService.deleteMessage({ messageId });
+            },
+            async createGroupChat(participantIds: number[], chatName: string) {
+                await signalrService.createGroupChat({ creatorId: this.id, participantIds, chatName });
+            },
+            async deleteChat(chatId: number) {
+                await signalrService.deleteChat({ chatId });
+            },
+            async switchTab(tab: string) {
+                this.chatListTabSelected = tab;
+                await this.fetchChats(tab);
+            },
+            async fetchChats(tab: string) {
+                if (!signalrService.connection) return;
+                if (tab === "dm") {
+                    await signalrService.connection.invoke("GetDirectMessagesForUser", this.id);
+                } else if (tab === "gc") {
+                    await signalrService.connection.invoke("GetGroupChatsForUser", this.id);
+                }
+            },
         }
     });
 </script>

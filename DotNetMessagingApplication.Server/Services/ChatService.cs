@@ -120,5 +120,16 @@ namespace DotNetMessagingApplication.Server.Services
         {
             return await _chatRepository.GetChatsForUser(userId);
         }
+
+        public async Task<IEnumerable<Chat>> GetDirectMessagesForUser(int userId)
+        {
+            var chats = await _chatRepository.GetChatsForUser(userId);
+            return chats.Where(c => c is DirectMessage);
+        }
+        public async Task<IEnumerable<Chat>> GetGroupChatsForUser(int userId)
+        {
+            var chats = await _chatRepository.GetChatsForUser(userId);
+            return chats.Where(c => c is GroupChat);
+        }
     }
 }

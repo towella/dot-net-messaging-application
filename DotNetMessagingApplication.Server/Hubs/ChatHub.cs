@@ -98,29 +98,33 @@ namespace DotNetMessagingApplication.Server.Hubs
 			}
 			try
 			{
-				_chatService.CreateChat(request.CreatorId, request.ParticipantIds, request.ChatName);
+				await _chatService.CreateChat(request.CreatorId, request.ParticipantIds, request.ChatName);
+                await Clients.All.SendAsync("ChatCreated", request.ChatName);
+
             }
-			catch (Exception ex)
+            catch (Exception ex)
 			{
 				await Clients.Caller.SendAsync("ReceiveError", $"Error creating group chat: {ex.Message}");
             }
-
-
-            //await Clients.All.SendAsync("ChatCreated", chat);
         }
 
-		public async Task DeleteChat(int chatId)
+		public async Task DeleteChat([FromBody] DeleteChatRequest request)
 		{
-			//var success = _chatService.DeleteChat(chatId);
-
-			//if (success)
-			//{
-				await Clients.All.SendAsync("ChatDeleted", chatId);
-			//}
-			//else
-			//{
-			//	await Clients.Caller.SendAsync("ReceiveError", "Failed to delete chat.");
-			//}
+			try
+			{
+				if (request == null)
+				{
+					await Clients.Caller.SendAsync("ReceiveError", "Chat data is missing.");
+					return;
+				}
+				await _chatService.DeleteChat(request.ChatId);
+				await Clients.All.SendAsync("ChatDeleted", request.ChatId);
+			}
+			catch (Exception ex)
+			{
+				await Clients.Caller.SendAsync("ReceiveError", $"Error deleting chat: {ex.Message}");
+				return;
+			}
 		}
 
 		public async Task GetChats(int userId)
@@ -129,7 +133,19 @@ namespace DotNetMessagingApplication.Server.Hubs
 			await Clients.Caller.SendAsync("ReceiveChats", chats);
 		}
 
-		public async Task JoinChatGroup(int chatId)
+		public async Task GetDirectMessages(int userId)
+		{
+			var chats = _chatService.GetDirectMessagesForUser(userId);
+			await Clients.Caller.SendAsync("ReceiveDms", chats);
+        }
+
+		public async Task GetGroupChats(int userId)
+		{
+			var chats = _chatService.GetGroupChatsForUser(userId);
+			await Clients.Caller.SendAsync("ReceiveGroupChats", chats);
+        }
+
+        public async Task JoinChatGroup(int chatId)
 		{
 			await Groups.AddToGroupAsync(Context.ConnectionId, chatId.ToString());
 		}
@@ -147,7 +163,7 @@ namespace DotNetMessagingApplication.Server.Hubs
 			await base.OnConnectedAsync();
 		}
 
-		public override async Task OnDisconnectedAsync(Exception exception)
+		public override async Task OnDisconnectedAsync(Exception? exception)
 		{
 			await base.OnDisconnectedAsync(exception);
 		}
