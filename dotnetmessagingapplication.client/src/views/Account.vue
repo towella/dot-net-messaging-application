@@ -29,17 +29,13 @@
             .then(r => r.json())
 
             const profileImage = document.getElementById('profile-picture')! as HTMLImageElement;
-            const usernameInput = document.getElementById('username')! as HTMLInputElement;
-            const emailInput = document.getElementById('email')! as HTMLInputElement;
-            const phoneInput = document.getElementById('phone')! as HTMLInputElement;
-            const pronounsInput = document.getElementById('pronouns')! as HTMLInputElement;
-            const bioInput = document.getElementById('bio')! as HTMLInputElement;
             profileImage.src = "https://i.insider.com/602ee9ced3ad27001837f2ac?width=700";
-            usernameInput.value = response.username;
-            emailInput.value = response.email;
-            phoneInput.value = response.phone;
-            pronounsInput.value = response.pronouns;
-            bioInput.value = response.bio;
+
+            this.newUsername = response.username;
+            this.newEmail = response.email;
+            this.newPhone = response.phone;
+            this.newPronouns = response.pronouns;
+            this.newBio = response.bio;
         },
 
         methods: {
@@ -55,10 +51,10 @@
                 const pronounsInput = document.getElementById('pronouns')! as HTMLInputElement;
                 const bioInput = document.getElementById('bio')! as HTMLInputElement;
                     
-                if (!usernameInput.value || !emailInput.value || !phoneInput.value || !pronounsInput || !bioInput) {
-                    this.errorMessage = "All fields must be filled to save";
+                if (!this.newUsername || !this.newEmail || !this.newPhone || !this.newPronouns || !this.newBio) {
+                    this.errorMessage = 'All fields must be filled to save';
                 } else {
-                    this.errorMessage = "";
+                    this.errorMessage = '';
                     console.log(emailInput.value);
                     const response = await fetch('https://localhost:7157/api/controllers/updateUser', {
                         method: 'POST',
@@ -67,11 +63,11 @@
                         },
                         body: JSON.stringify({ 
                             oldUsername: this.$route.params.username,
-                            username: usernameInput.value,
-                            email: emailInput.value,
-                            phone: phoneInput.value,
-                            pronouns: pronounsInput.value,
-                            bio: bioInput.value,
+                            username: this.newUsername,
+                            email: this.newEmail,
+                            phone: this.newPhone,
+                            pronouns: this.newPronouns,
+                            bio: this.newBio,
                         })
                     })
 
