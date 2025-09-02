@@ -26,6 +26,9 @@ public class AccountServiceTests
 			},
 		};
 
+		_mockUserRepo.Setup(m => m.GetUserByEmailOrUsername(It.IsAny<string>())).Returns((User?)null);
+		_mockUserRepo.Setup(m => m.GetUserByEmailOrUsername(It.Is<string>(s => s == testUsers[0].Username || s == testUsers[0].Email))).Returns(testUsers[0]);
+
 		_mockUserRepo.Setup(m => m.AddUser(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
 						.Callback<string, string, string, string>((u, e, pw, pr) => testUsers.Add(new User
 						{
@@ -78,6 +81,28 @@ public class AccountServiceTests
 
 		Assert.DoesNotThrow(() => _accountService.UpdateDetails(newDetails));
 		_mockUserRepo.Verify(m => m.UpdateDetails(It.Is<User>(u => u.Username == "test")), Times.Once);
+	}
+
+	#endregion
+
+
+	#region GetDetails
+
+	[Test]
+	public void GetDetails_WhenUserDoesNotExist_ThrowsException()
+	{
+		InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => _accountService.GetDetails("minion"));
+		Assert.That(ex.Message, Is.EqualTo("User does not exist."));
+	}
+
+	[TestCase("test", Description = "Username check.")]
+	[TestCase("test@test.com", Description = "Username check.")]
+	public void GetDetails_WhenUserExists_ReturnsCorrectDetails(string emailOrUsername)
+	{
+		User user = _accountService.GetDetails(emailOrUsername);
+		Assert.That(user.Username, Is.EqualTo("test"));
+		Assert.That(user.Email, Is.EqualTo("test@test.com"));
+		Assert.That(user.Password, Is.EqualTo("password"));
 	}
 
 	#endregion
