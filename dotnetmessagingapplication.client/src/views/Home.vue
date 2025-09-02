@@ -161,9 +161,6 @@
                 formData.append("chatId", this.chats[this.selectedChatIndex].id.toString());
                 formData.append("senderId", this.id.toString());
 
-                console.log(this.chats[this.selectedChatIndex].id.toString())
-                console.log("senderId", this.id.toString());
-
                 try {
                     const response = await fetch("https://localhost:7157/api/images/upload", {
                         method: "POST",
