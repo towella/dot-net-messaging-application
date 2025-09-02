@@ -8,7 +8,7 @@ public interface IAccountService
 {
 	void AddUser(string username, string email, string password, string pronouns);
 
-	void UpdateDetails(User newDetails);
+	void UpdateDetails(User user);
 
 	User GetDetails(string emailOrUsername);
 }
@@ -27,9 +27,9 @@ public class AccountService(IUserRepository userRepo) : IAccountService
 		_userRepo.AddUser(username, email, password, pronouns);
 	}
 
-	public void UpdateDetails(User newDetails)
+	public void UpdateDetails(User user)
 	{
-		_userRepo.UpdateDetails(newDetails);
+		_userRepo.UpdateDetails(user);
 	}
 
 	public User GetDetails(string emailOrUsername)
