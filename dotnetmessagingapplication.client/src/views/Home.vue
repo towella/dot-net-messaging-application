@@ -61,14 +61,12 @@
                 const idx = this.chats.findIndex(c => c.id === chatId);
                 if (idx !== -1) this.chats.splice(idx, 1);
             });
-            // Listen for chats received from SignalR
             if (signalrService.connection) {
                 signalrService.connection.on("ReceiveChats", (chats) => {
                     this.chats = chats;
                     this.selectedChatIndex = 0;
                 });
             }
-            // Optionally, load DMs by default
             await this.fetchChats("dm");
         },
 
@@ -123,6 +121,43 @@
                     await signalrService.connection.invoke("GetGroupChatsForUser", this.id);
                 }
             },
+            triggerImageUpload() {
+                const input = document.getElementById("image-input") as HTMLInputElement;
+                input?.click();
+            },
+
+            async sendImage(event: Event) {
+                const input = event.target as HTMLInputElement;
+                const file = input.files?.[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append("image", file);
+                formData.append("chatId", this.chats[this.selectedChatIndex].id.toString());
+                formData.append("senderId", this.id.toString());
+
+                console.log(this.chats[this.selectedChatIndex].id.toString())
+                console.log("senderId", this.id.toString());
+
+
+                try {
+                    const response = await fetch("https://localhost:7157/api/images/upload", {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Upload failed:", errorText);
+                        return;
+                    }
+
+                    const message: types.Message = await response.json();
+                    this.chats[this.selectedChatIndex].messages.push(message);
+                } catch (err) {
+                    console.error("Unexpected error:", err);
+                }
+            }
         }
     });
 </script>
@@ -174,12 +209,17 @@
             <div id="chat-window">
                 <MessageBubble v-if="chats[selectedChatIndex]?.messages.length > 0" 
                     v-for="m in chats[selectedChatIndex]?.messages"
-                    :sender="m.authorName" :body="m.body" :external-message="m.authorName != $route.params.username"></MessageBubble>
+                    :sender="m.authorName" :body="m.body" :image-url="m.imageUrl" :external-message="m.authorName != $route.params.username"></MessageBubble>
                 <p v-else style="align-self: center;">No one has said anything yet. Start the conversation!</p>
             </div>
 
             <div id="input-bar">
                 <textarea id="message-input" type="text" placeholder="Message the chat..."></textarea>
+                <input type="file" id="image-input" accept="image/*" style="display: none;" @change="sendImage" />
+                <button @click="triggerImageUpload">
+                    <img src="../assets/icons/image.png" style="width: 30px;" />
+                </button>
+
                 <button id="send-button" v-on:click="sendMessage()">Send</button>
             </div>
         </div>

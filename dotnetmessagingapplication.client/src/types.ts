@@ -9,4 +9,5 @@ export interface Message {
   authorName: string,
   body: string,
   chatId: number,
+  imageUrl?: string,
 }

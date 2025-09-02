@@ -14,6 +14,7 @@
       sender: String,
       body: String,
       // true: other client sent, false: this client sent
+      imageUrl: { type: String, required: false },
       externalMessage: Boolean,
     }
   });
@@ -25,6 +26,7 @@
         <p id="sender">{{ sender }}</p>
         <Widget id="message-body-bubble" :class="{'internal-message': !externalMessage, 'external-message': externalMessage}">
             <p id="message-body-text">{{ body }}</p>
+              <img v-if="imageUrl" :src="imageUrl" class="message-image" />
         </Widget>
     </div>
   </div>
@@ -58,6 +60,14 @@
 
   .external-message {
       background-color: var(--secondaryStandoutColour);
+  }
+
+  .message-image {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin-top: 5px;
+      border-radius: 8px;
   }
 
   #sender {
