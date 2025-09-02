@@ -1,14 +1,12 @@
-﻿namespace DotNetMessagingApplication.Server.Services
+﻿using DotNetMessagingApplication.Server.Data.Models;
+
+namespace DotNetMessagingApplication.Server.Services
 {
     public interface IMessageService
     {
         // these might be subject to change...
-        Task<int> CreateMessage();
-        Task<int> UpdateMessage(int messageId);
-
-        Task DeleteMessage(int messageId);
-
-        Task SendMessage();
-        Task<int> GetUnreadMessages(int userId);
+        Task<int> UpdateMessage(int messageId, string content);
+        Task<int> DeleteMessage(int messageId);
+        Task<int> SendMessage(Message message);
     }
 }

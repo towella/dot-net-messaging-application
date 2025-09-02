@@ -6,7 +6,8 @@ namespace DotNetMessagingApplication.Server.Data.Repositories.Base
     {
         Task<Chat?> GetChatById(int ChatId);
         Task<int> DeleteChat(int chatId);
-        Task<IEnumerable<Chat>> GetAllChatsForSpecificUser(int userId);
-        Task<Chat> AddChat(int userId);
+        Task<IEnumerable<Chat>> GetChatsForUser(int userId);
+        Task<DirectMessage> CreateDirectMessage(DirectMessage directMessage);
+        Task<GroupChat> CreateGroupChat(GroupChat groupChat, IEnumerable<GroupChatMember> members);
     }
 }

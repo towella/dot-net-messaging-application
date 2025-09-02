@@ -1,6 +1,9 @@
+using DotNetMessagingApplication.Server.Controllers;
 using DotNetMessagingApplication.Server.Data;
 using DotNetMessagingApplication.Server.Data.Repositories;
 using DotNetMessagingApplication.Server.Services;
+using DotNetMessagingApplication.Server.Hubs;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
+
 
 // add context, then repos, then services
 builder.Services.AddDbContext<MessagingAppContext>()
@@ -54,6 +59,7 @@ app.UseCors();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/chatHub");
 
 app.MapFallbackToFile("/index.html");
 
