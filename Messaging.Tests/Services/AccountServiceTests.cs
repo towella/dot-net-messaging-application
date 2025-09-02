@@ -100,7 +100,7 @@ public class AccountServiceTests
 		User newDetails = new User()
 		{
 			Username = username ?? "newUsername",
-			Password = password! ,
+			Password = password!,
 			Email = email!,
 			Pronouns = pronouns,
 		};

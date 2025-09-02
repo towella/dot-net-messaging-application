@@ -16,6 +16,6 @@ public class LoginService(IUserRepository userRepo) : ILoginService
 	{
 		User? user = _userRepo.GetUserByPasswordAndEmailOrUsername(emailOrUsername, password);
 		
-		return user != null;
+		return user is not null;
 	}
 }
