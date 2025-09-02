@@ -10,10 +10,10 @@ namespace DotNetMessagingApplication.Server.Services
 {
 	public class ChatService : IChatService
 	{
-		private readonly IChatRepository _chatRepository;
+		private readonly ChatRepository _chatRepository;
 		private readonly MessagingAppContext _context;
 
-		public ChatService(IChatRepository chatRepository, MessagingAppContext context)
+		public ChatService(ChatRepository chatRepository, MessagingAppContext context)
 		{
 			_chatRepository = chatRepository;
 			_context = context;
@@ -103,12 +103,6 @@ namespace DotNetMessagingApplication.Server.Services
 			}
 
 			return await _chatRepository.CreateGroupChat(groupChat, members);
-		}
-
-		public async Task<int> UpdateChatAsync(int chatId)
-		{
-			// Placeholder for future update logic
-			return 0;
 		}
 
 		public async Task<int> DeleteChat(int chatId)

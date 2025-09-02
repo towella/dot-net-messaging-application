@@ -32,13 +32,13 @@ namespace DotNetMessagingApplication.Server.Hubs
 			{
 				MessageBody = sentMessage.Message,
 				SenderId = sentMessage.SenderId,
-				ChatId = sentMessage.ChatId
-			};
+				ChatId = sentMessage.ChatId,
+				ImageUrl = sentMessage.ImageUrl,
+            };
 
-			var savedMessage = _messageService.SendMessage(message);
+            var savedMessage = _messageService.SendMessage(message);
 
-			await Clients.Group(sentMessage.ChatId.ToString())
-						 .SendAsync("ReceiveMessage", savedMessage);
+			await Clients.Group(sentMessage.ChatId.ToString()).SendAsync("ReceiveMessage", savedMessage);
 		}
 
 		public async Task DeleteMessage([FromBody] DeleteMessageRequest deletedMessage)

@@ -6,18 +6,20 @@ namespace DotNetMessagingApplication.Server.Services
 	public class MessageService : IMessageService
 	{
 		private readonly MessageRepository _messageRepository;
-
-		public MessageService(MessageRepository messageRepository)
+		private readonly IBlobService _blobService;
+		public MessageService(MessageRepository messageRepository, IBlobService blobService)
 		{
 			_messageRepository = messageRepository;
-		}
+			_blobService = blobService;
+        }
 
-		public async Task<int> SendMessage(Message message)
-		{
-			return await _messageRepository.AddMessage(message);
-		}
+        public async Task<int> SendMessage(Message message)
+        {
+            return await _messageRepository.AddMessage(message);
+        }
 
-		public async Task<int> UpdateMessage(int messageId, string newContent)
+
+        public async Task<int> UpdateMessage(int messageId, string newContent)
 		{
 			try
 			{
@@ -45,7 +47,12 @@ namespace DotNetMessagingApplication.Server.Services
 				{
 					throw new Exception("Message not found :(");
 				}
-				return await _messageRepository.DeleteMessage(messageId);
+
+				if (!string.IsNullOrEmpty(message.Result!.ImageUrl))
+				{
+					await _blobService.DeleteBlob(message.Result.ImageUrl);
+                }
+                return await _messageRepository.DeleteMessage(messageId);
 			}
 			catch
 			{

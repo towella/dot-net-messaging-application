@@ -25,4 +25,6 @@ public class Message
 
 	[Required]
 	public Chat Chat { get; set; } = null!;
+
+	public string? ImageUrl { get; set; }
 }
