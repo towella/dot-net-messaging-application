@@ -2,7 +2,7 @@
 
 public interface IChatService
 {
-	Task<Chat> CreateChat(int creatorId, IEnumerable<int> participantIds, string? chatName);
+	Task<Chat> CreateChat(string creatorUser, IEnumerable<string> participantUsers, string? chatName);
 	Task<int> DeleteChat(int chatId);
 	Task<IEnumerable<Chat>> GetChatsForUser(int userId);
 	Task<IEnumerable<Chat>> GetDirectMessagesForUser(int userId);

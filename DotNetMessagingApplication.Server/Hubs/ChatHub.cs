@@ -20,7 +20,7 @@ namespace DotNetMessagingApplication.Server.Hubs
 		}
 
 		#region messages
-		public async Task SendMessage([FromBody] SendMessageRequest sentMessage)
+		public async Task SendMessage(SendMessageRequest sentMessage)
 		{
 			if (sentMessage == null)
 			{
@@ -41,7 +41,7 @@ namespace DotNetMessagingApplication.Server.Hubs
 			await Clients.Group(sentMessage.ChatId.ToString()).SendAsync("ReceiveMessage", savedMessage);
 		}
 
-		public async Task DeleteMessage([FromBody] DeleteMessageRequest deletedMessage)
+		public async Task DeleteMessage(DeleteMessageRequest deletedMessage)
 		{
 			try
 			{
@@ -62,7 +62,7 @@ namespace DotNetMessagingApplication.Server.Hubs
 			}
 		}
 
-		public async Task EditMessage([FromBody] EditMessageRequest editedMessage)
+		public async Task EditMessage(EditMessageRequest editedMessage)
 		{
 			try
 			{
@@ -89,7 +89,7 @@ namespace DotNetMessagingApplication.Server.Hubs
 		#endregion
 
 		#region chats
-		public async Task CreateGroupChat([FromBody] CreateChatRequest request)
+		public async Task CreateChat(CreateChatRequest request)
 		{
 			if (request == null)
 			{
@@ -98,7 +98,7 @@ namespace DotNetMessagingApplication.Server.Hubs
 			}
 			try
 			{
-				await _chatService.CreateChat(request.CreatorId, request.ParticipantIds, request.ChatName);
+				await _chatService.CreateChat(request.CreatorUser, request.ParticipantUsers, request.ChatName);
                 await Clients.All.SendAsync("ChatCreated", request.ChatName);
 
             }
@@ -108,7 +108,7 @@ namespace DotNetMessagingApplication.Server.Hubs
             }
         }
 
-		public async Task DeleteChat([FromBody] DeleteChatRequest request)
+		public async Task DeleteChat(DeleteChatRequest request)
 		{
 			try
 			{

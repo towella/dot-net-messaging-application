@@ -5,7 +5,6 @@ using DotNetMessagingApplication.Server.Data.Repositories.Base;
 using DotNetMessagingApplication.Server.Services;
 using DotNetMessagingApplication.Server.Hubs;
 using Microsoft.OpenApi.Models;
-using DotNetMessagingApplication.Server.Data.Repositories.Base;
 
 
 var builder = WebApplication.CreateBuilder(args);
