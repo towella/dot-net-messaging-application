@@ -6,7 +6,7 @@ namespace DotNetMessagingApplication.Server.Dtos;
 public class UpdateUserRequest
 {
 	[JsonProperty("oldUsername")]
-	public string oldUsername { get; set; } = null!;
+	public string OldUsername { get; set; } = null!;
 
 	[JsonProperty("username")]
 	public string Username { get; set; } = null!;

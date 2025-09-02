@@ -1,8 +1,8 @@
-using DotNetMessagingApplication.Server.Controllers;
 using DotNetMessagingApplication.Server.Data;
 using DotNetMessagingApplication.Server.Data.Repositories;
-using DotNetMessagingApplication.Server.Services;
 using DotNetMessagingApplication.Server.Hubs;
+using DotNetMessagingApplication.Server.Services;
+using Microsoft.OpenApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +14,8 @@ builder.Services.AddCors(options =>
 		{
 			policy.WithOrigins("https://localhost:51163")
 			.AllowAnyHeader()
-			.AllowAnyMethod();
+			.AllowAnyMethod()
+			.AllowCredentials();
 		});
 });
 
@@ -23,15 +24,29 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+	options.SupportNonNullableReferenceTypes();
+
+	options.MapType<IFormFile>(() => new OpenApiSchema
+	{
+		Type = "string",
+		Format = "binary"
+	});
+});
+builder.Services.AddScoped<IBlobService, BlobService>();
 builder.Services.AddSignalR();
 
 
 // add context, then repos, then services
 builder.Services.AddDbContext<MessagingAppContext>()
-				.AddScoped<UserRepository>()
+				.AddScoped<IUserRepository, UserRepository>()
+				.AddScoped<MessageRepository>()
+				.AddScoped<ChatRepository>()
 				.AddScoped<ILoginService, LoginService>()
-				.AddScoped<IAccountService, AccountService>();
+				.AddScoped<IAccountService, AccountService>()
+				.AddScoped<IMessageService, MessageService>()
+				.AddScoped<IChatService, ChatService>();
 
 var app = builder.Build();
 

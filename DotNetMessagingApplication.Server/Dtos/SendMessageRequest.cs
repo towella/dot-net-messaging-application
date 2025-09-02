@@ -11,5 +11,7 @@ namespace DotNetMessagingApplication.Server.Dtos
 		public int SenderId { get; set; }
 		[JsonProperty("chatId")]
 		public int ChatId { get; set; }
-	}
+		[JsonProperty("imageUrl")]
+		public string? ImageUrl { get; set; }
+    }
 }
