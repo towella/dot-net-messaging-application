@@ -11,7 +11,7 @@ public interface IUserRepository : IRepository<User>
 
 	void AddUser(string username, string email, string password, string pronouns);
 
-	void UpdateDetails(User oldDetails, User newDetails);
+	void UpdateDetails(User updatedUser);
 	
 	void SeedOneUserAndChild();
 }
@@ -55,11 +55,9 @@ public class UserRepository : Repository<User>, IUserRepository
 		SaveChanges();
 	}
 
-	public void UpdateDetails(User oldDetails, User newDetails)
+	public void UpdateDetails(User updatedUser)
 	{
-		// transfer new info into user
-
-		Update(oldDetails);
+		Update(updatedUser);
 		SaveChanges();
 	}
 

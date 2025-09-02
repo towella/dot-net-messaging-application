@@ -29,29 +29,7 @@ public class AccountService(IUserRepository userRepo) : IAccountService
 
 	public void UpdateDetails(User newDetails)
 	{
-		User? existingUser = _userRepo.GetUserByEmailOrUsername(newDetails.Username) ?? throw new InvalidOperationException("User does not exist.");
-
-		//if (newDetails.Username is null)
-		//{
-		//	throw new ArgumentException("Username is empty.");
-		//}
-
-		//if (newDetails.Password is null)
-		//{
-		//	throw new ArgumentException("Password is empty.");
-		//}
-
-		//if (newDetails.Email is null)
-		//{
-		//	throw new ArgumentException("Email is empty.");
-		//}
-
-		//if (!MailAddress.TryCreate(newDetails.Email, out _))
-		//{
-		//	throw new ArgumentException("Email is invalid.");
-		//}
-
-		_userRepo.UpdateDetails(existingUser, newDetails);
+		_userRepo.UpdateDetails(newDetails);
 	}
 
 	public User GetDetails(string emailOrUsername)
