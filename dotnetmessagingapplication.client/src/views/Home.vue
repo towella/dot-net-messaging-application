@@ -78,6 +78,7 @@
             async changeChat(chatId: number) {
                 this.selectedChatIndex = this.chats.findIndex(c => c.id === chatId);
             },
+
             async sendMessage() {
                 const messageInput = document.getElementById("message-input") as HTMLTextAreaElement | null;
                 const messageText = messageInput?.value ?? "";
@@ -102,22 +103,28 @@
                     });
                 }
             },
+            
             async editMessage(messageId: number, newContent: string) {
                 await signalrService.editMessage({ messageId, newMessage: newContent });
             },
+
             async deleteMessage(messageId: number) {
                 await signalrService.deleteMessage({ messageId });
             },
+
             async createGroupChat(participantIds: number[], chatName: string) {
                 await signalrService.createGroupChat({ creatorId: this.id, participantIds, chatName });
             },
+
             async deleteChat(chatId: number) {
                 await signalrService.deleteChat({ chatId });
             },
+
             async switchTab(tab: string) {
                 this.chatListTabSelected = tab;
                 this.chats = await this.fetchChats(tab);
             },
+
             async fetchChats(tab: string) {
                 if (!signalrService.connection) return new Array<types.Chat>;
                 if (tab === "dm") {
@@ -127,6 +134,7 @@
                 }
                 return new Array<types.Chat>;
             },
+
             createNewChat() {
                 var userNames: Array<string> = [];
                 var username: string | null = prompt("Create chat with: (leave empty to create) ", "");
@@ -136,8 +144,8 @@
                 }
 
                 // create a chat with userNames in it
-            }
             },
+
             triggerImageUpload() {
                 const input = document.getElementById("image-input") as HTMLInputElement;
                 input?.click();
@@ -152,10 +160,6 @@
                 formData.append("image", file);
                 formData.append("chatId", this.chats[this.selectedChatIndex].id.toString());
                 formData.append("senderId", this.id.toString());
-
-                console.log(this.chats[this.selectedChatIndex].id.toString())
-                console.log("senderId", this.id.toString());
-
 
                 try {
                     const response = await fetch("https://localhost:7157/api/images/upload", {
