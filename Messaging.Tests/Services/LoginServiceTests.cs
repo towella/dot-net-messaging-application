@@ -30,6 +30,8 @@ public class LoginServiceTests
 		_loginService = new LoginService(_mockUserRepo.Object);
 	}
 
+	#region Login
+
 	[TestCase("test", "password")]
 	[TestCase("test@test.com", "password")]
 	public void Login_WhenDetailsAreCorrect_ReturnsTrue(string emailOrUsername, string password)
@@ -47,4 +49,6 @@ public class LoginServiceTests
 		bool loggedIn = _loginService.Login(emailOrUsername, password);
 		Assert.That(loggedIn, Is.False);
 	}
+
+	#endregion
 }

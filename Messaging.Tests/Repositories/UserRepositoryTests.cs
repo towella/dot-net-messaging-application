@@ -51,6 +51,8 @@ public class UserRepositoryTests
 		_userRepository = new UserRepository(_mockContext.Object);
 	}
 
+	#region GetUserByPasswordAndEmailOrUsername
+
 	// covers both success and failure cases
 	[TestCase("test", "test", true, Description = "Correct username check")]
 	[TestCase("test@test.com", "test", true, Description = "Correct email check")]
@@ -73,6 +75,11 @@ public class UserRepositoryTests
 
 		Assert.That(user is not null, Is.EqualTo(shouldFindUser));
 	}
+
+	#endregion
+
+
+	#region AddUser
 
 	[Test]
 	public void AddUser_WhenEmailAndUsernameAreUnique_Success()
@@ -107,6 +114,11 @@ public class UserRepositoryTests
 		Assert.That(_mockContext.Object.Users.Count(), Is.EqualTo(userCount));
 	}
 
+	#endregion
+
+
+	#region UpdateDetails
+
 	[Test]
 	public void UpdateDetails_Success()
 	{
@@ -120,4 +132,5 @@ public class UserRepositoryTests
 		_mockContext.Verify(m => m.Set<User>().Update(It.Is<User>(u => u.Username == "test")), Times.Once);
 	}
 
+	#endregion
 }
