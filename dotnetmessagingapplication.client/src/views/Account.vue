@@ -8,14 +8,19 @@
     export default defineComponent({
         data() {
             return {
-                errorMessage: "",
+                errorMessage: '',
+                newUsername: '',
+                newEmail: '',
+                newPhone: '',
+                newPronouns: '',
+                newBio: ''
             };
         },
 
         // lifecycle hook (called on mount)
         async mounted() {
             const response = await fetch('https://localhost:7157/api/controllers/details', {
-                method: "POST",
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -56,7 +61,7 @@
                     this.errorMessage = "";
                     console.log(emailInput.value);
                     const response = await fetch('https://localhost:7157/api/controllers/updateUser', {
-                        method: "POST",
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
@@ -96,27 +101,27 @@
 
             <div class="account-item">
                 <label for="username">Username: </label>
-                <input id="username" placeholder="Username..."/>
+                <input v-model="newUsername" id="username" placeholder="Username..."/>
             </div>
 
             <div class="account-item">
                 <label for="email">Email: </label>
-                <input id="email" type="email" placeholder="Email..."/>
+                <input v-model="newEmail" id="email" type="email" placeholder="Email..."/>
             </div>
 
             <div class="account-item">
                 <label for="phone">Phone: </label>
-                <input id="phone" type="number" placeholder="Phone..."/>
+                <input v-model="newPhone" id="phone" type="number" placeholder="Phone..."/>
             </div>
 
             <div class="account-item">
                 <label for="pronouns">Pronouns: </label>
-                <input id="pronouns" placeholder="They/Them/Theirs..."/>
+                <input v-model="newPronouns" id="pronouns" placeholder="They/Them/Theirs..."/>
             </div>
 
             <div class="account-item">
                 <p for="bio" style="margin-bottom:0;">Bio</p>
-                <textarea id="bio" placeholder="Bio..."></textarea>
+                <textarea v-model="newBio" id="bio" placeholder="Bio..."></textarea>
             </div>
 
             <div class="account-item">
