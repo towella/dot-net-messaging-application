@@ -76,30 +76,9 @@ public class AccountServiceTests
 			Pronouns = "she/her",
 		};
 
-		_accountService.UpdateDetails(newDetails);
-
 		Assert.DoesNotThrow(() => _accountService.UpdateDetails(newDetails));
-		_mockUserRepo.Verify(m => m.UpdateDetails(It.IsAny<User>()), Times.Once);
+		_mockUserRepo.Verify(m => m.UpdateDetails(It.Is<User>(u => u.Username == "test")), Times.Once);
 	}
-
-	//[TestCase("test", null, "new@email.com", "she/her", "Password is empty.", Description = "Empty password check")]
-	//[TestCase("test", "newPassword", null, "she/her", "Email is empty.", Description = "Empty email check")]
-	//[TestCase("test", "newPassword", "invalid email", "she/her", "Email is invalid.", Description = "Invalid email check")]
-	//public void UpdateDetails_WhenInvalidDetails_ThrowsArgumentException(string? username, string? password, string? email, string? pronouns, string expectedMessage)
-	//{
-	//	_mockUserRepo.Setup(m => m.GetUserByEmailOrUsername(It.Is<string>(x => x == "test" || x == "test@test.com"))).Returns(testUsers[0]);
-
-	//	User newDetails = new User()
-	//	{
-	//		Username = username ?? "newUsername",
-	//		Password = password!,
-	//		Email = email!,
-	//		Pronouns = pronouns,
-	//	};
-
-	//	ArgumentException ex = Assert.Throws<ArgumentException>(() => _accountService.UpdateDetails(newDetails));
-	//	Assert.That(ex.Message, Is.EqualTo(expectedMessage));
-	//}
 
 	#endregion
 }

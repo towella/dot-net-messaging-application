@@ -39,6 +39,7 @@ public class UserRepositoryTests
 									{
 										User old = users.Single(user => user.Username == u.Username);
 										old.Username = u.Username;
+										old.Password = u.Password;
 										old.Email = u.Email;
 										old.Phone = u.Phone;
 										old.Pronouns = u.Pronouns;
@@ -109,12 +110,14 @@ public class UserRepositoryTests
 	[Test]
 	public void UpdateDetails_Success()
 	{
-		User newDetails = new User { Username = "test", Password = "newPassword", Email = "test@test.com" };
+		User newDetails = new User { Username = "test", Password = "newPassword", Email = "new@email.com", Pronouns = "they/them" };
 		_userRepository.UpdateDetails(newDetails);
 
-		Assert.That(_mockContext.Object.Users.First().Password, Is.EqualTo("newPassword"));
+		Assert.That(_mockContext.Object.Users.First().Password, Is.EqualTo(newDetails.Password));
+		Assert.That(_mockContext.Object.Users.First().Email, Is.EqualTo(newDetails.Email));
+		Assert.That(_mockContext.Object.Users.First().Pronouns, Is.EqualTo(newDetails.Pronouns));
 
-		_mockContext.Verify(m => m.Set<User>().Update(It.IsAny<User>()), Times.Once);
+		_mockContext.Verify(m => m.Set<User>().Update(It.Is<User>(u => u.Username == "test")), Times.Once);
 	}
 
 }
