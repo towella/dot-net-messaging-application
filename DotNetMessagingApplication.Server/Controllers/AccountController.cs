@@ -45,7 +45,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
 	{
 		try
 		{
-			User user = _accountService.GetDetails(request.oldUsername);
+			User user = _accountService.GetDetails(request.OldUsername);
 			var validationMessage = ValidateAccountDetails(request.Username, user.Password, request.Email, request.Pronouns, request.Phone);
 			if (validationMessage != string.Empty)
 			{

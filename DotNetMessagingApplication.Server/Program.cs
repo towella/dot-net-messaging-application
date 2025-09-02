@@ -1,6 +1,7 @@
 using DotNetMessagingApplication.Server.Controllers;
 using DotNetMessagingApplication.Server.Data;
 using DotNetMessagingApplication.Server.Data.Repositories;
+using DotNetMessagingApplication.Server.Data.Repositories.Base;
 using DotNetMessagingApplication.Server.Services;
 using DotNetMessagingApplication.Server.Hubs;
 using Microsoft.OpenApi.Models;
@@ -42,7 +43,7 @@ builder.Services.AddSignalR();
 
 // add context, then repos, then services
 builder.Services.AddDbContext<MessagingAppContext>()
-				.AddScoped<UserRepository>()
+				.AddScoped<IUserRepository, UserRepository>()
 				.AddScoped<MessageRepository>()
 				.AddScoped<ChatRepository>()
 				.AddScoped<ILoginService, LoginService>()

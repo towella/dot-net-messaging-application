@@ -22,6 +22,7 @@
 
         // lifecycle hook (called on mount)
         async mounted() {
+            // get user details
             const response = await fetch('https://localhost:7157/api/controllers/details', {
                 method: "POST",
                 headers: {
@@ -31,6 +32,7 @@
             })
             .then(r => r.json())
             this.id = response.id;
+
             // Start SignalR connection (replace with your backend SignalR hub URL)
             await signalrService.startConnection("https://localhost:7157/chatHub");
 
@@ -42,47 +44,51 @@
                     chat.messages.push(message);
                 }
             });
+
             signalrService.onMessageEdited((messageId, newContent) => {
                 for (const chat of this.chats) {
                     const msg = chat.messages.find(m => m.id === messageId);
                     if (msg) msg.body = newContent;
                 }
             });
+
             signalrService.onMessageDeleted((messageId) => {
                 for (const chat of this.chats) {
                     const idx = chat.messages.findIndex(m => m.id === messageId);
                     if (idx !== -1) chat.messages.splice(idx, 1);
                 }
             });
-            signalrService.onChatCreated((chatName) => {
-                // Optionally fetch new chats or add to list
-            });
+
             signalrService.onChatDeleted((chatId) => {
                 const idx = this.chats.findIndex(c => c.id === chatId);
                 if (idx !== -1) this.chats.splice(idx, 1);
             });
+
             if (signalrService.connection) {
-                signalrService.connection.on("ReceiveChats", (chats) => {
+                signalrService.connection.on("ReceiveChats", (chats: Array<types.Chat>) => {
                     this.chats = chats;
                     this.selectedChatIndex = 0;
                 });
             }
-            await this.fetchChats("dm");
+            // Optionally, load DMs by default
+            this.chats = await this.fetchChats("dm");
         },
 
         methods: {
-            async changeChat(chatId: string) {
-
+            async changeChat(chatId: number) {
+                this.selectedChatIndex = this.chats.findIndex(c => c.id === chatId);
             },
             async sendMessage() {
                 const messageInput = document.getElementById("message-input") as HTMLTextAreaElement | null;
                 const messageText = messageInput?.value ?? "";
 
                 if (messageInput && messageText !== "") {
-                    const chat = this.chats[0];
+                    const chat = this.chats[this.selectedChatIndex];
                     const message: types.Message = {
+                        id: null,
+                        chatId: chat.id,
                         authorId: this.id,
-                        authorName: this.$route.params.username,
+                        authorName: this.$route.params.username as string,
                         body: messageText,
                     };
 
@@ -96,7 +102,6 @@
                     });
                 }
             },
-
             async editMessage(messageId: number, newContent: string) {
                 await signalrService.editMessage({ messageId, newMessage: newContent });
             },
@@ -111,15 +116,27 @@
             },
             async switchTab(tab: string) {
                 this.chatListTabSelected = tab;
-                await this.fetchChats(tab);
+                this.chats = await this.fetchChats(tab);
             },
             async fetchChats(tab: string) {
-                if (!signalrService.connection) return;
+                if (!signalrService.connection) return new Array<types.Chat>;
                 if (tab === "dm") {
-                    await signalrService.connection.invoke("GetDirectMessagesForUser", this.id);
+                    return await signalrService.connection.invoke("GetDirectMessagesForUser", this.id);
                 } else if (tab === "gc") {
-                    await signalrService.connection.invoke("GetGroupChatsForUser", this.id);
+                    return await signalrService.connection.invoke("GetGroupChatsForUser", this.id);
                 }
+                return new Array<types.Chat>;
+            },
+            createNewChat() {
+                var userNames: Array<string> = [];
+                var username: string | null = prompt("Create chat with: (leave empty to create) ", "");
+                while (username != null && username != "") {
+                    userNames.push(username);
+                    username = prompt("Create chat with: (leave empty to create) ", "");
+                }
+
+                // create a chat with userNames in it
+            }
             },
             triggerImageUpload() {
                 const input = document.getElementById("image-input") as HTMLInputElement;
@@ -179,7 +196,7 @@
                     <label for="chat-search"><img src="../assets/icons/search.png" style="width: 20px; padding-top: 5px;" /></label>
                     <input id="chat-search" placeholder="Search chats..." />
                 </div>
-                <button style="padding: 3px;"><img src="../assets/icons/message.png" style="width: 30px;" /></button>
+                <button v-on:click="createNewChat()" style="padding: 3px;"><img src="../assets/icons/message.png" style="width: 30px;" /></button>
             </div>
 
             <div id="chat-list-tabs">
