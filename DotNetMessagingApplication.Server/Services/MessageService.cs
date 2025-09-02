@@ -25,8 +25,8 @@ namespace DotNetMessagingApplication.Server.Services
 				if (message == null)
 				{
 					throw new Exception("Message not found :(");
-                }
-                int senderId = message.SenderId;
+				}
+				int senderId = message.SenderId;
 				await _messageRepository.EditMessage(messageId, senderId, newContent);
 				return 1;
 			}
@@ -50,7 +50,7 @@ namespace DotNetMessagingApplication.Server.Services
 			catch
 			{
 				return 0;
-            }
-        }
+			}
+		}
 	}
 }

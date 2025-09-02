@@ -6,10 +6,10 @@ namespace DotNetMessagingApplication.Server.Dtos
 	public class EditMessageRequest
 	{
 		[JsonProperty("messageId")]
-        public int MessageId { get; set; }
+		public int MessageId { get; set; }
 		[JsonProperty("newMessage")]
-        public string NewMessage { get; set; }
+		public string NewMessage { get; set; }
 		[JsonProperty("userId")]
-        public int UserId { get; set; } // makes sure user can only edit their own messages
+		public int UserId { get; set; } // makes sure user can only edit their own messages
 	}
 }
