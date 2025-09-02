@@ -37,14 +37,7 @@ public class AccountService(IUserRepository userRepo) : IAccountService
 		// seeding, temporary for testing
 		_userRepo.SeedOneUserAndChild();
 
-
-		User? user = _userRepo.GetUserByEmailOrUsername(emailOrUsername);
-
-		if (user is null)
-		{
-			throw new InvalidOperationException("User does not exist.");
-		}
-
+		User? user = _userRepo.GetUserByEmailOrUsername(emailOrUsername) ?? throw new InvalidOperationException("User does not exist.");
 		return user;
 	}
 }

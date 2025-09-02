@@ -63,16 +63,58 @@ public class UserRepositoryTests
 		Assert.That(user is not null, Is.EqualTo(shouldFindUser));
 	}
 
+	[TestCase("test", true, Description = "Correct username check")]
+	[TestCase("test@test.com", true, Description = "Correct email check")]
+	[TestCase("duck", false, Description = "Wrong details check")]
+	public void GetUserByEmailOrUsername_ReturnsExpectedResult(string emailOrUsername, bool shouldFindUser)
+	{
+		User? user = _userRepository.GetUserByEmailOrUsername(emailOrUsername);
 
-	/*
-	 	User? GetUserByPasswordAndEmailOrUsername(string emailOrUsername, string password);
+		Assert.That(user is not null, Is.EqualTo(shouldFindUser));
+	}
 
-	User? GetUserByEmailOrUsername(string emailOrUsername);
+	[Test]
+	public void AddUser_WhenEmailAndUsernameAreUnique_Success()
+	{
+		int userCount = _mockContext.Object.Users.Count();
 
-	void AddUser(string username, string email, string password, string pronouns);
+		_userRepository.AddUser("banana", "minion@banana.com", "banana", "he/him");
 
-	void UpdateDetails(User oldDetails, User newDetails);
-	
-	 */
+		Assert.That(_mockContext.Object.Users.Count(), Is.EqualTo(userCount + 1));
+		Assert.That(_mockContext.Object.Users.Last().Username, Is.EqualTo("banana"));
+		Assert.That(_mockContext.Object.Users.Last().Email, Is.EqualTo("minion@banana.com"));
+		Assert.That(_mockContext.Object.Users.Last().Password, Is.EqualTo("banana"));
+		Assert.That(_mockContext.Object.Users.Last().Pronouns, Is.EqualTo("he/him"));
+	}
+
+	[Test]
+	public void AddUser_WhenEmailIsNotUnique_ThrowsException()
+	{
+		int userCount = _mockContext.Object.Users.Count();
+
+		ArgumentException ex = Assert.Throws<ArgumentException>(() => _userRepository.AddUser("newUser", "test@test.com", "password", "they/them"));
+		Assert.That(_mockContext.Object.Users.Count(), Is.EqualTo(userCount));
+	}
+
+	[Test]
+	public void AddUser_WhenUsernameIsNotUnique_ThrowsException()
+	{
+		int userCount = _mockContext.Object.Users.Count();
+
+		ArgumentException ex = Assert.Throws<ArgumentException>(() => _userRepository.AddUser("test", "new@email.com", "password", "they/them"));
+		Assert.That(ex.Message, Is.EqualTo("Username or email already exists."));
+		Assert.That(_mockContext.Object.Users.Count(), Is.EqualTo(userCount));
+	}
+
+	[Test]
+	public void UpdateDetails_Success()
+	{
+		User newDetails = new User { Username = "test", Password = "newPassword", Email = "test@test.com" };
+		_userRepository.UpdateDetails(newDetails);
+
+		Assert.That(_mockContext.Object.Users.First().Password, Is.EqualTo("newPassword"));
+
+		_mockContext.Verify(m => m.Set<User>().Update(It.IsAny<User>()), Times.Once);
+	}
 
 }
