@@ -1,11 +1,8 @@
-using DotNetMessagingApplication.Server.Controllers;
 using DotNetMessagingApplication.Server.Data;
 using DotNetMessagingApplication.Server.Data.Repositories;
-using DotNetMessagingApplication.Server.Data.Repositories.Base;
-using DotNetMessagingApplication.Server.Services;
 using DotNetMessagingApplication.Server.Hubs;
+using DotNetMessagingApplication.Server.Services;
 using Microsoft.OpenApi.Models;
-using DotNetMessagingApplication.Server.Data.Repositories.Base;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,13 +26,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SupportNonNullableReferenceTypes();
+	options.SupportNonNullableReferenceTypes();
 
-    options.MapType<IFormFile>(() => new OpenApiSchema
-    {
-        Type = "string",
-        Format = "binary"
-    });
+	options.MapType<IFormFile>(() => new OpenApiSchema
+	{
+		Type = "string",
+		Format = "binary"
+	});
 });
 builder.Services.AddScoped<IBlobService, BlobService>();
 builder.Services.AddSignalR();
