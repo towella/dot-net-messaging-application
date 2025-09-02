@@ -8,4 +8,5 @@ export interface Message {
   authorId: string,
   authorName: string,
   body: string,
+  chatId: string,
 }

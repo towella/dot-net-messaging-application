@@ -6,6 +6,7 @@
 <script lang="ts">
     import { defineComponent } from 'vue'
     import * as types from '../types.ts'
+    import signalrService from '../signalrService'
 
     export default defineComponent({
         props: {
@@ -23,7 +24,17 @@
 
         // lifecycle hook (called on mount)
         async mounted() {
+            // Start SignalR connection (replace with your backend SignalR hub URL)
+            await signalrService.startConnection("https://localhost:7157/chatHub");
 
+            // Listen for incoming messages
+            signalrService.onMessageReceived((message: types.Message) => {
+                // Find the chat by message.chatId and push the message
+                const chat = this.chats.find(c => c.id === message.chatId);
+                if (chat) {
+                    chat.messages.push(message);
+                }
+            });
         },
 
         methods: {
@@ -37,16 +48,21 @@
 
             },
 
-            sendMessage() {
+            async sendMessage() {
                 let messageInput: HTMLTextAreaElement | null = document.getElementById("message-input") as HTMLTextAreaElement | null;
                 let messageText: string = messageInput?.value ?? "";
-                console.log(messageText);
                 if (messageInput && messageText != "") {
-                    this.chats[0].messages.push({
-                        authorId: this.$route.params.id,
+                    const chat = this.chats[this.selectedChatIndex];
+                    const message: types.Message = {
+                        authorId: Array.isArray(this.$route.params.id) ? this.$route.params.id[0] : this.$route.params.id,
                         authorName: "Name",
                         body: messageText,
-                    } as types.Message);
+                        chatId: chat.id // Add chatId property if not present in Message type
+                    };
+                    // Send via SignalR
+                    await signalrService.sendMessage(chat.id, message);
+                    // Optionally, add to local state for instant feedback
+                    chat.messages.push(message);
                     messageInput.value = "";
                 }
             }
