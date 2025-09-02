@@ -43,19 +43,11 @@
                 this.$router.push('home');
             },
 
-            async saveChanges() {
-                const profileImage = document.getElementById('profile-picture')! as HTMLImageElement;
-                const usernameInput = document.getElementById('username')! as HTMLInputElement;
-                const emailInput = document.getElementById('email')! as HTMLInputElement;
-                const phoneInput = document.getElementById('phone')! as HTMLInputElement;
-                const pronounsInput = document.getElementById('pronouns')! as HTMLInputElement;
-                const bioInput = document.getElementById('bio')! as HTMLInputElement;
-                    
+            async saveChanges() {                   
                 if (!this.newUsername || !this.newEmail || !this.newPhone || !this.newPronouns || !this.newBio) {
                     this.errorMessage = 'All fields must be filled to save';
                 } else {
                     this.errorMessage = '';
-                    console.log(emailInput.value);
                     const response = await fetch('https://localhost:7157/api/controllers/updateUser', {
                         method: 'POST',
                         headers: {
