@@ -2,14 +2,14 @@
 
 namespace DotNetMessagingApplication.Server.Dtos
 {
-    [JsonObject]
-    public class SendMessageRequest
-    {
-        [JsonProperty("message")]
-        public string Message { get; set; }
-        [JsonProperty("senderId")]
-        public int SenderId { get; set; }
-        [JsonProperty("chatId")]
-        public int ChatId { get; set; }
-    }
+	[JsonObject]
+	public class SendMessageRequest
+	{
+		[JsonProperty("message")]
+		public string Message { get; set; }
+		[JsonProperty("senderId")]
+		public int SenderId { get; set; }
+		[JsonProperty("chatId")]
+		public int ChatId { get; set; }
+	}
 }
