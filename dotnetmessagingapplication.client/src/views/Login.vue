@@ -38,7 +38,7 @@
                 .then(r => r.json())
 
                 if (response.success === true) {
-                    this.$router.push('user-id-example/home');
+                    this.$router.push(`${this.username}/home`);
                 }
                 else {
                     this.errorMessage = 'Incorrect login details, please try again!'

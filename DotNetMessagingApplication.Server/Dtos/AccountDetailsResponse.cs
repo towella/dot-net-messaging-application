@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace DotNetMessagingApplication.Server.Dtos;
@@ -6,6 +7,9 @@ namespace DotNetMessagingApplication.Server.Dtos;
 [JsonObject]
 public class AccountDetailsResponse
 {
+	[JsonProperty("id")]
+	public int Id { get; set; } = -1;
+
 	[JsonProperty("username")]
 	public string Username { get; set; } = string.Empty;
 

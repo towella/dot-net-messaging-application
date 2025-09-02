@@ -1,11 +1,13 @@
 export interface Chat {
-  id: string,
+  id: number,
   name: string,
   messages: Array<Message>,
 }
 
 export interface Message {
-  authorId: string,
+  id: number | null,
+  authorId: number,
   authorName: string,
   body: string,
+  chatId: number,
 }

@@ -6,49 +6,141 @@
 <script lang="ts">
     import { defineComponent } from 'vue'
     import * as types from '../types.ts'
+    import signalrService from '../signalrService'
 
     export default defineComponent({
-        props: {
-            id: String,
-        },
         data() {
             return {
                 chatListTabSelected: "dm",
-                chats: [{id: "id", name: "da boyz", messages: [{authorId: "author id", authorName: "Name", body: "message!!"}]},
-                        {id: "asd", name: "pijins", messages: []}
+                chats: [{id: 32, name: "da boyz", messages: [{authorId: 45, authorName: "Name", body: "message!!"}]},
+                        {id: 60, name: "pijins", messages: []}
                 ] as Array<types.Chat>,
                 selectedChatIndex: 0,
+                id: -1,
             };
         },
 
         // lifecycle hook (called on mount)
         async mounted() {
+            // get user details
+            const response = await fetch('https://localhost:7157/api/controllers/details', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ emailOrUsername: this.$route.params.username})
+            })
+            .then(r => r.json())
+            this.id = response.id;
 
+            // Start SignalR connection (replace with your backend SignalR hub URL)
+            await signalrService.startConnection("https://localhost:7157/chatHub");
+
+            // Listen for incoming messages
+            signalrService.onMessageReceived((message: types.Message) => {
+                // Find the chat by message.chatId and push the message
+                const chat = this.chats.find(c => c.id === message.chatId);
+                if (chat) {
+                    chat.messages.push(message);
+                }
+            });
+
+            signalrService.onMessageEdited((messageId, newContent) => {
+                for (const chat of this.chats) {
+                    const msg = chat.messages.find(m => m.id === messageId);
+                    if (msg) msg.body = newContent;
+                }
+            });
+
+            signalrService.onMessageDeleted((messageId) => {
+                for (const chat of this.chats) {
+                    const idx = chat.messages.findIndex(m => m.id === messageId);
+                    if (idx !== -1) chat.messages.splice(idx, 1);
+                }
+            });
+
+            signalrService.onChatCreated((chatName) => {
+                // Optionally fetch new chats or add to list
+            });
+
+            signalrService.onChatDeleted((chatId) => {
+                const idx = this.chats.findIndex(c => c.id === chatId);
+                if (idx !== -1) this.chats.splice(idx, 1);
+            });
+
+            // Listen for chats received from SignalR
+            if (signalrService.connection) {
+                signalrService.connection.on("ReceiveChats", (chats: Array<types.Chat>) => {
+                    this.chats = chats;
+                    this.selectedChatIndex = 0;
+                });
+            }
+            // Optionally, load DMs by default
+            this.chats = await this.fetchChats("dm");
         },
 
         methods: {
-            switchTab(tab: string) {
-                this.chatListTabSelected = tab;
-                // repopulate chats list with API call
-                this.chats = [];
+            async changeChat(chatId: number) {
+                this.selectedChatIndex = this.chats.findIndex(c => c.id === chatId);
             },
+            async sendMessage() {
+                const messageInput = document.getElementById("message-input") as HTMLTextAreaElement | null;
+                const messageText = messageInput?.value ?? "";
 
-            async changeChat(chatId: string) {
-
-            },
-
-            sendMessage() {
-                let messageInput: HTMLTextAreaElement | null = document.getElementById("message-input") as HTMLTextAreaElement | null;
-                let messageText: string = messageInput?.value ?? "";
-                console.log(messageText);
-                if (messageInput && messageText != "") {
-                    this.chats[0].messages.push({
-                        authorId: this.$route.params.id,
-                        authorName: "Name",
+                if (messageInput && messageText !== "") {
+                    const chat = this.chats[this.selectedChatIndex];
+                    const message: types.Message = {
+                        id: null,
+                        chatId: chat.id,
+                        authorId: this.id,
+                        authorName: this.$route.params.username as string,
                         body: messageText,
-                    } as types.Message);
+                    };
+
+                    chat.messages.push(message);
                     messageInput.value = "";
+
+                    await signalrService.sendMessage({
+                        chatId: chat.id,
+                        message: messageText,
+                        senderId: this.id
+                    });
                 }
+            },
+            async editMessage(messageId: number, newContent: string) {
+                await signalrService.editMessage({ messageId, newMessage: newContent });
+            },
+            async deleteMessage(messageId: number) {
+                await signalrService.deleteMessage({ messageId });
+            },
+            async createGroupChat(participantIds: number[], chatName: string) {
+                await signalrService.createGroupChat({ creatorId: this.id, participantIds, chatName });
+            },
+            async deleteChat(chatId: number) {
+                await signalrService.deleteChat({ chatId });
+            },
+            async switchTab(tab: string) {
+                this.chatListTabSelected = tab;
+                this.chats = await this.fetchChats(tab);
+            },
+            async fetchChats(tab: string) {
+                if (!signalrService.connection) return new Array<types.Chat>;
+                if (tab === "dm") {
+                    return await signalrService.connection.invoke("GetDirectMessagesForUser", this.id);
+                } else if (tab === "gc") {
+                    return await signalrService.connection.invoke("GetGroupChatsForUser", this.id);
+                }
+                return new Array<types.Chat>;
+            },
+            createNewChat() {
+                var userNames: Array<string> = [];
+                var username: string | null = prompt("Create chat with: (leave empty to create) ", "");
+                while (username != null && username != "") {
+                    userNames.push(username);
+                    username = prompt("Create chat with: (leave empty to create) ", "");
+                }
+
+                // create a chat with userNames in it
             }
         }
     });
@@ -60,7 +152,7 @@
         <div id="settings-buttons">
             <!-- <input type="image" src="https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png"></input> -->
             <RouterLink :to="{name: 'Settings'}"><img src="../assets/icons/settings.png" style="width: 40px;" /></RouterLink>
-            <RouterLink :to="{name: 'Account'}">Account</RouterLink>
+            <RouterLink :to="{name: 'Account'}"><img id="profile-picture" src="https://i.insider.com/602ee9ced3ad27001837f2ac?width=700"></img></RouterLink>
         </div>
     </div>
 
@@ -71,7 +163,7 @@
                     <label for="chat-search"><img src="../assets/icons/search.png" style="width: 20px; padding-top: 5px;" /></label>
                     <input id="chat-search" placeholder="Search chats..." />
                 </div>
-                <button style="padding: 3px;"><img src="../assets/icons/message.png" style="width: 30px;" /></button>
+                <button v-on:click="createNewChat()" style="padding: 3px;"><img src="../assets/icons/message.png" style="width: 30px;" /></button>
             </div>
 
             <div id="chat-list-tabs">
@@ -101,7 +193,7 @@
             <div id="chat-window">
                 <MessageBubble v-if="chats[selectedChatIndex]?.messages.length > 0" 
                     v-for="m in chats[selectedChatIndex]?.messages"
-                    :sender="m.authorName" :body="m.body" :external-message="m.authorId != $route.params.id"></MessageBubble>
+                    :sender="m.authorName" :body="m.body" :external-message="m.authorName != $route.params.username"></MessageBubble>
                 <p v-else style="align-self: center;">No one has said anything yet. Start the conversation!</p>
             </div>
 
@@ -136,6 +228,13 @@
         display: flex;
         align-items: center;
         margin-right: 2%;
+    }
+
+    #profile-picture {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: white 3px solid;
     }
 
     #body-content {

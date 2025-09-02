@@ -17,26 +17,12 @@
             };
         },
 
-        // lifecycle hook (called on mount)
-        async mounted() {
-
-        },
-
         methods: {
             async create() {
                 if (!this.username || !this.password || !this.email || !this.pronouns) {
                     this.errorMessage = 'One or more fields were blank. All fields are required.'
                     return
                 }
-
-                const validateExp = /[^a-zA-z0-9_.-]+/
-
-                if (validateExp.test(this.username) || validateExp.test(this.password)) {
-                    this.errorMessage = 'Username or password contains invalid characters.'
-                    return
-                }
-                // validate input
-                // create account
 
                 const response = await fetch('https://localhost:7157/api/controllers/addUser', {
                     method: "POST",
@@ -53,7 +39,7 @@
                 })
 
                 if (response.status === 200) {
-                    this.$router.push('user-id-example-2/home');
+                    this.$router.push(`${this.username}/home`);
                 }
                 else {
                     this.errorMessage = await response.text()
