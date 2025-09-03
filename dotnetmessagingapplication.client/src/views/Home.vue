@@ -85,7 +85,7 @@
                 this.selectedChatIndex = this.chats.findIndex(c => c.chatId === chatId);
                 const chat = this.chats[this.selectedChatIndex];
                 console.log(chat)
-                var newChat = await signalrService.changeChat({ chatId: chat.chatId }) // returns chat[];
+                var newChat = await signalrService.changeChat({ chatId: chat.chatId });
                 console.log("new chat", newChat)
                 chat.messages = newChat.messages;
                 console.log(chat)
