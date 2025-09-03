@@ -32,7 +32,7 @@
 <template>
     <div id="settings">
         <div id="header">
-            <Button class="back-button" v-on:click="returnHome()"><</Button>
+            <button class="back-button" v-on:click="returnHome()"><</button>
             <h1>Settings</h1>
             <div style="width: 70px;"></div> <!-- This empty div is required for even spacing -->
         </div>

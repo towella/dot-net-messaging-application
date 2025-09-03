@@ -4,6 +4,8 @@ import NewAccount from '../views/NewAccount.vue'
 import Home from '../views/Home.vue'
 import Settings from '../views/Settings.vue'
 import Account from '../views/Account.vue'
+import AudioChat from '@/views/AudioChat.vue'
+import VideoChat from '@/views/VideoChat.vue'
 import NotFound from '../views/NotFound.vue'
 
 const rootPath = '/dot-net-messaging-application'
@@ -33,6 +35,16 @@ const routes = [
     path: `${rootPath}/:username/account`,
     name: 'Account',
     component: Account
+},
+{
+    path: `${rootPath}/:username/audio-chat`,
+    name: 'AudioChat',
+    component: AudioChat
+},
+{
+    path: `${rootPath}/:username/video-chat`,
+    name: 'VideoChat',
+    component: VideoChat
 },
 { 
     path: '/:pathMatch(.*)*',

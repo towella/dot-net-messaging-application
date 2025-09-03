@@ -279,8 +279,8 @@
             <div id="chat-window-header">
                 <h2 id="chat-heading">{{ chatHeading }}</h2>
                 <div id="call-buttons">
-                    <RouterLink :to="{name: 'Login'}"><img src="../assets/icons/call.png" style="width: 40px;"/></RouterLink>
-                    <RouterLink :to="{name: 'Login'}"><img src="../assets/icons/video.png" style="width: 40px;"/></RouterLink>
+                    <RouterLink :to="{name: 'AudioChat'}"><img src="../assets/icons/call.png" style="width: 40px;"/></RouterLink>
+                    <RouterLink :to="{name: 'VideoChat'}"><img src="../assets/icons/video.png" style="width: 40px;"/></RouterLink>
                 </div>
             </div>
 

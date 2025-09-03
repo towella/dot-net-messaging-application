@@ -6,7 +6,7 @@ namespace DotNetMessagingApplication.Server.Dtos
 	public class SendMessageRequest
 	{
 		[JsonProperty("message")]
-		public string Message { get; set; }
+		public string Message { get; set; } = null!;
 		[JsonProperty("senderId")]
 		public int SenderId { get; set; }
 		[JsonProperty("chatId")]

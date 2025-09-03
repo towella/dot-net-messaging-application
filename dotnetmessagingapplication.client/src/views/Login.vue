@@ -57,7 +57,7 @@
             </div>
             <div class="login-input">
                 <label for="password-input">Password: </label>
-                <input id="password-input" v-model="password" placeholder="Password..."/>
+                <input type="password" id="password-input" v-model="password" placeholder="Password..."/>
             </div>
             <button id="login-button" v-on:click="login()">Log in</button>
             <p id="error-message" v-show="errorMessage">{{ errorMessage }}</p>
