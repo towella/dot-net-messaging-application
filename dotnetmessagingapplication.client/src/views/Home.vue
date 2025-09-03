@@ -297,7 +297,7 @@
 
             <div id="input-bar">
                 <textarea id="message-input" type="text" placeholder="Message the chat..."></textarea>
-                <input type="file" id="image-input" accept="image/*" style="display: none;" @change="sendPigeonImage" />
+                <input type="file" id="image-input" accept="image/*" style="display: none;" @change="sendMessage()" />
                 <button @click="triggerImageUpload" style="padding:0; width: 75px;">
                     <img src="../assets/icons/image.png" style="height: 50px;" />
                 </button>
