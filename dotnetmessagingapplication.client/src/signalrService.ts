@@ -18,7 +18,7 @@ class SignalRService {
         this.connection?.on("ReceiveMessage", callback);
     }
 
-    async sendMessage(request: { senderId: number, chatId: number, message: string }) {
+    async sendMessage(request: { senderId: number, chatId: number, message: string, imageUrl?: string | null }) {
         await this.connection?.invoke("SendMessage", request);
     }
 

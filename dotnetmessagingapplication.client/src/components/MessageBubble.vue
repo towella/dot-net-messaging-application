@@ -1,5 +1,11 @@
 <script setup lang="ts">
     import Widget from '../components/Widget.vue'
+    defineProps<{
+        sender: string,
+        body: string,
+        imageUrl?: string | null,
+        externalMessage?: boolean
+    }>();
 </script>
 
 <script lang="ts">
@@ -26,7 +32,7 @@
         <p id="sender">{{ sender }}</p>
         <Widget id="message-body-bubble" :class="{'internal-message': !externalMessage, 'external-message': externalMessage}">
             <p id="message-body-text">{{ body }}</p>
-              <img v-if="imageUrl" :src="imageUrl" class="message-image" />
+              <img v-if="imageUrl" :src="imageUrl" class="message-image" style="max-width: 200px; max-height: 200px; margin-top: 8px;" />
         </Widget>
     </div>
   </div>

@@ -15,6 +15,7 @@
                 chats: [] as types.Chat[],
                 selectedChatIndex: 0,
                 id: -1,
+                selectedImageFile: null as File | null,
             };
         },
         computed: {
@@ -84,37 +85,82 @@
                 this.selectedChatIndex = this.chats.findIndex(c => c.chatId === chatId);
                 const chat = this.chats[this.selectedChatIndex];
                 console.log(chat)
-                var newChat = await signalrService.changeChat({ chatId: chat.chatId }) // returns chat[];
+                var newChat = await signalrService.changeChat({ chatId: chat.chatId });
                 console.log("new chat", newChat)
                 chat.messages = newChat.messages;
                 console.log(chat)
             },
 
+            handleImageSelection(event: Event) {
+                const input = event.target as HTMLInputElement;
+                const file = input.files?.[0];
+                if (!file) return;
+
+                this.selectedImageFile = file;
+            },
+
             async sendMessage() {
-                const messageInput = document.getElementById("message-input") as HTMLTextAreaElement | null;
-                const messageText = messageInput?.value ?? "";
+            let imageUrl: string | null = null;
+            const messageInput = document.getElementById("message-input") as HTMLTextAreaElement | null;
+            const messageText = messageInput?.value ?? "";
 
-                if (messageInput && messageText !== "") {
+            if (messageInput && messageText !== "") {
                     const chat = this.chats[this.selectedChatIndex];
-                    console.log(chat.chatId)
-                    console.log(chat)
-                    const message: types.Message = {
-                        id: null,
-                        chatId: chat.chatId,
-                        authorId: this.id,
-                        senderUser: this.$route.params.username as string,
-                        body: messageText,
-                    };
+                    console.log("Selected image file:", this.selectedImageFile);
+                    if (this.selectedImageFile) {
+                        const formData = new FormData();
+                        formData.append("image", this.selectedImageFile);
+                        formData.append("chatId", this.chats[this.selectedChatIndex].chatId.toString());
+                        formData.append("senderId", this.id.toString());
+                        formData.append("message", messageText);
+                        messageInput.value = ""; // Clear input
 
-                    chat.messages.push(message);
-                    messageInput.value = "";
+                        try {
+                        const response = await fetch("https://localhost:7157/api/images/upload", {
+                            method: "POST",
+                            body: formData,
+                        });
 
-                    await signalrService.sendMessage({
-                        chatId: chat.chatId,
-                        message: messageText,
-                        senderId: this.id
-                    });
-                }
+                        console.log("response", response)
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            console.error("Image upload failed:", errorText);
+                            return;
+                        }
+
+                        const result = await response.json();
+                        imageUrl = result.imageUrl;
+                        } catch (err) {
+                        console.error("Unexpected error during image upload:", err);
+                        return;
+                        }
+
+                        this.selectedImageFile = null; // Clear after upload
+                    }
+
+                const newMessage: types.Message = {
+                    id: null,
+                    body: messageText,
+                    senderUser: this.$route.params.username as string,
+                    authorId: this.id,
+                    chatId: this.chats[this.selectedChatIndex].chatId,
+                    imageUrl: imageUrl,
+                };
+                console.log("ahfuiaio")
+                console.log(newMessage)
+
+                await signalrService.sendMessage({
+                    senderId: this.id,
+                    chatId: this.chats[this.selectedChatIndex].chatId,
+                    message: messageText,
+                    imageUrl: imageUrl,
+                })
+                chat.messages.push(newMessage);
+                console.log(newMessage)
+
+                messageInput.value = ""; // Clear input
+            };
             },
             
             async editMessage(messageId: number, newContent: string) {
@@ -194,35 +240,6 @@
                 const input = document.getElementById("image-input") as HTMLInputElement;
                 input?.click();
             },
-
-            async sendImage(event: Event) {
-                const input = event.target as HTMLInputElement;
-                const file = input.files?.[0];
-                if (!file) return;
-
-                const formData = new FormData();
-                formData.append("image", file);
-                formData.append("chatId", this.chats[this.selectedChatIndex].chatId.toString());
-                formData.append("senderId", this.id.toString());
-
-                try {
-                    const response = await fetch("https://localhost:7157/api/images/upload", {
-                        method: "POST",
-                        body: formData,
-                    });
-
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.error("Upload failed:", errorText);
-                        return;
-                    }
-
-                    const message: types.Message = await response.json();
-                    this.chats[this.selectedChatIndex].messages.push(message);
-                } catch (err) {
-                    console.error("Unexpected error:", err);
-                }
-            },
         }
     });
 </script>
@@ -280,8 +297,7 @@
 
             <div id="input-bar">
                 <textarea id="message-input" type="text" placeholder="Message the chat..."></textarea>
-                <input type="file" id="image-input" accept="image/*" style="display: none;" @change="sendImage" />
-                <!-- yall idk why the button is slightly higher than the rest i cbb fixing it rn -->
+                <input type="file" id="image-input" accept="image/*" style="display: none;" @change="sendMessage()" />
                 <button @click="triggerImageUpload" style="padding:0; width: 75px;">
                     <img src="../assets/icons/image.png" style="height: 50px;" />
                 </button>

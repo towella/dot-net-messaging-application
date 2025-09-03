@@ -1,4 +1,5 @@
 ﻿using DotNetMessagingApplication.Server.Data.Models;
+using DotNetMessagingApplication.Server.Data.Repositories;
 using DotNetMessagingApplication.Server.Dtos;
 using DotNetMessagingApplication.Server.Services;
 using Microsoft.AspNetCore.Http;
@@ -15,12 +16,16 @@ namespace DotNetMessagingApplication.Server.Controllers
 	{
 		private readonly IBlobService _blobService;
 		private readonly IMessageService _messageService;
+		private readonly IChatService _chatService;
+		private readonly IUserRepository _userRepository;
 
-		public MessageController(IBlobService blobService, IMessageService messageService)
+        public MessageController(IBlobService blobService, IMessageService messageService, IChatService chatService, IUserRepository userRepository)
 		{
 			_blobService = blobService;
 			_messageService = messageService;
-		}
+			_chatService = chatService;
+			_userRepository = userRepository;
+        }
 
 		[HttpPost("upload")]
 		public async Task<IActionResult> UploadImage([FromForm] UploadImageRequest request)
@@ -31,13 +36,18 @@ namespace DotNetMessagingApplication.Server.Controllers
 			{
 				var imageUrl = await _blobService.UploadImage(request.Image);
 
-				var message = new Message
+				var chat = await _chatService.GetChatById(request.ChatId);
+
+                var message = new Message
 				{
 					ChatId = request.ChatId,
 					SenderId = request.SenderId,
-					MessageBody = "",
-					ImageUrl = imageUrl
-				};
+					MessageBody = request.MessageBody,
+					ImageUrl = imageUrl,
+					Chat = chat!,
+					RecipientChat = chat!,
+					RecipientChatId = chat!.ChatId,
+                };
 
 				var savedMessage = _messageService.SendMessage(message);
 				return Ok(savedMessage);

@@ -12,6 +12,8 @@ namespace DotNetMessagingApplication.Server.Dtos
 
         [FromForm(Name = "senderId")]
         public int SenderId { get; set; }
-    }
 
+        [FromForm(Name = "messageBody")]
+        public string MessageBody { get; set; } = " ";
+    }
 }
