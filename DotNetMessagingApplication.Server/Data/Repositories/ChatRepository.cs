@@ -20,7 +20,8 @@ namespace DotNetMessagingApplication.Server.Data.Repositories
 				.Include(c => (c as GroupChat)!.Admin)
 				.Include(c => (c as GroupChat)!.Members)
 				.ThenInclude(m => m.User)
-				.FirstOrDefaultAsync(c => c.ChatId == chatId);
+				.Include(c => c.Messages)
+                .FirstOrDefaultAsync(c => c.ChatId == chatId);
 			return chat;
 		}
 
@@ -36,7 +37,12 @@ namespace DotNetMessagingApplication.Server.Data.Repositories
 			_context.Set<GroupChat>().Add(groupChat);
 			await _context.SaveChangesAsync(); // Save to generate ChatId
 
-			_context.Set<GroupChatMember>().AddRange(members);
+			foreach (var member in members)
+			{
+				member.GroupChatId = groupChat.ChatId;
+            }
+
+            _context.Set<GroupChatMember>().AddRange(members);
 			await _context.SaveChangesAsync();
 
 			return groupChat;
@@ -49,21 +55,49 @@ namespace DotNetMessagingApplication.Server.Data.Repositories
 				.ExecuteDeleteAsync();
 		}
 
-		public async Task<IEnumerable<Chat>> GetChatsForUser(int userId)
+		public async Task<IEnumerable<Chat>> GetChatsForUser(string username)
 		{
 			var directMessages = await _context.Set<DirectMessage>()
 				.Include(dm => dm.User)
 				.Include(dm => dm.OtherPerson)
-				.Where(dm => dm.UserId == userId || dm.OtherPersonId == userId)
+				.Where(dm => dm.User.Username == username || dm.OtherPerson.Username == username)
 				.ToListAsync();
 
 			var groupChats = await _context.Set<GroupChat>()
 				.Include(gc => gc.Members)
 				.ThenInclude(m => m.User)
-				.Where(gc => gc.Members.Any(m => m.UserId == userId))
+				.Where(gc => gc.Members.Any(m => m.User.Username == username))
 				.ToListAsync();
 
 			return directMessages.Cast<Chat>().Concat(groupChats.Cast<Chat>());
 		}
-	}
+
+		public async Task<IEnumerable<Chat>> GetDirectMessagesForUser(string username)
+		{
+            var directMessages = await _context.Set<DirectMessage>()
+                .Include(dm => dm.User)
+                .Include(dm => dm.OtherPerson)
+                .Where(dm => dm.User.Username == username || dm.OtherPerson.Username == username)
+                .ToListAsync();
+			return directMessages.Cast<Chat>();
+        }
+		public async Task<IEnumerable<Chat>> GetGroupChatsForUser(string username)
+		{
+            var groupChats = await _context.Set<GroupChat>()
+                .Include(gc => gc.Members)
+                .ThenInclude(m => m.User)
+                .Where(gc => gc.Members.Any(m => m.User.Username == username))
+                .ToListAsync();
+			return groupChats.Cast<Chat>();
+        }
+
+		public async Task<int> UpdateChat(Chat chat)
+		{
+			await _context.Set<Chat>().Where(c => c.ChatId == chat.ChatId)
+				.ExecuteUpdateAsync(c => c
+					.SetProperty(c => c.Messages, chat.Messages)
+                );
+            return await _context.SaveChangesAsync();
+        }
+    }
 }

@@ -1,5 +1,5 @@
 export interface Chat {
-  id: number,
+  chatId: number,
   name: string,
   messages: Array<Message>,
 }
@@ -7,7 +7,7 @@ export interface Chat {
 export interface Message {
   id: number | null,
   authorId: number,
-  authorName: string,
+  senderUser: string,
   body: string,
   chatId: number,
   imageUrl?: string,

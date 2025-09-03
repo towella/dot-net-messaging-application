@@ -5,6 +5,7 @@ using DotNetMessagingApplication.Server.Data.Repositories;
 using DotNetMessagingApplication.Server.Data.Repositories.Base;
 using DotNetMessagingApplication.Server.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Update.Internal;
 
 namespace DotNetMessagingApplication.Server.Services
 {
@@ -12,96 +13,111 @@ namespace DotNetMessagingApplication.Server.Services
 	{
 		private readonly ChatRepository _chatRepository;
 		private readonly MessagingAppContext _context;
+		private readonly IUserRepository _userRepository;
 
-		public ChatService(ChatRepository chatRepository, MessagingAppContext context)
+		public ChatService(ChatRepository chatRepository, MessagingAppContext context, IUserRepository userRepository)
 		{
 			_chatRepository = chatRepository;
 			_context = context;
+			_userRepository = userRepository;
 		}
 
-		public async Task<Chat> CreateChat(int creatorId, IEnumerable<int> participantIds, string? chatName)
+		public async Task<Chat> CreateChat(string creatorUser, IEnumerable<string> participantUsers, string? chatName)
 		{
-			int count = participantIds.Count();
+			var creator = _userRepository.GetUserByEmailOrUsername(creatorUser);
+			int count = participantUsers.Count();
 
-			if (count < 2)
-				throw new ArgumentException("A chat must have at least two participants.");
-
-			if (count == 2)
-			{
-				var user1 = participantIds.ElementAt(0);
-				var user2 = participantIds.ElementAt(1);
-				return await CreateDirectMessage(user1, user2);
+			if (count < 1) // since the enum doesn't contain the creator
+			{ 
+				throw new ArgumentException("A chat must have at least two participants."); 
 			}
-
-			return await CreateGroupChatAsync(creatorId, participantIds, chatName!);
+			else if (count == 1)
+			{
+				var otherUser = _userRepository.GetUserByEmailOrUsername(participantUsers.ElementAt(0));
+				if (otherUser is null)
+					throw new ArgumentException("other user not found.");
+				try
+				{
+					return await CreateDirectMessage(creator!, otherUser);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception("Error creating direct message: " + ex.Message);
+				}
+			}
+			else
+			{
+				if (chatName is null)
+				{ 
+					throw new ArgumentException("A group chat must have a name."); 
+				}
+				try
+				{
+					return await CreateGroupChatAsync(creator!, participantUsers, chatName);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception("Error creating group chat: " + ex.Message);
+				}
+			}
 		}
 
-
-		public async Task<Chat> CreateDirectMessage(int user1Id, int user2Id)
+		public async Task<Chat> CreateDirectMessage(User user1, User user2)
 		{
-			var user1 = await _context.Set<User>().FindAsync(user1Id);
-			var user2 = await _context.Set<User>().FindAsync(user2Id);
-
-			if (user1 == null || user2 == null)
-				throw new ArgumentException("One or both users not found.");
-
 			var directMessage = new DirectMessage
 			{
-				UserId = user1Id,
-				OtherPersonId = user2Id,
+				UserId = user1.Id,
+				OtherPersonId = user2.Id,
 				User = user1,
-				OtherPerson = user2
-			};
+				OtherPerson = user2,
+				Messages = new List<Message>()
+            };
 
 			return await _chatRepository.CreateDirectMessage(directMessage);
 		}
 
-		public async Task<Chat> CreateGroupChatAsync(int adminId, IEnumerable<int> chatParticipants, string chatName)
+		public async Task<Chat> CreateGroupChatAsync(User admin, IEnumerable<string> chatParticipants, string chatName)
 		{
 			if (chatParticipants.Count() < 2)
-				throw new ArgumentException("A group chat must have at least two participants.");
-
-			var adminUser = await _context.Set<User>().FindAsync(adminId);
-			if (adminUser == null)
-				throw new ArgumentException("Admin user not found.");
+				throw new ArgumentException("A group chat must have at least three participants.");
 
 			var groupChat = new GroupChat
 			{
-				AdminId = adminId,
-				Admin = adminUser,
-				ChatName = chatName
+				AdminId = admin.Id,
+				Admin = admin,
+				ChatName = chatName,
+				Messages = new List<Message>()
 			};
-
-			await _context.Set<GroupChat>().AddAsync(groupChat);
-			await _context.SaveChangesAsync(); // generate ChatId
 
 			var members = new List<GroupChatMember>
 			{
 				new GroupChatMember
 				{
 					GroupChatId = groupChat.ChatId,
-					UserId = adminId,
-					User = adminUser,
+					UserId = admin.Id,
+					User = admin,
 					Role = GroupChatRole.Admin
 				}
 			};
 
-			foreach (var participantId in chatParticipants)
+			foreach (var username in chatParticipants)
 			{
-				if (participantId == adminId) continue;
-
-				var user = await _context.Set<User>().FindAsync(participantId);
-				if (user == null) continue;
+				var user = _userRepository.GetUserByEmailOrUsername(username);
+				if (user == null)
+				{
+					throw new ArgumentException($"User '{username}' not found.");
+				}
 
 				members.Add(new GroupChatMember
 				{
 					GroupChatId = groupChat.ChatId,
-					UserId = participantId,
+					UserId = user.Id,
 					User = user,
 					Role = GroupChatRole.Member
 				});
 			}
 
+			groupChat.Members = members;
 			return await _chatRepository.CreateGroupChat(groupChat, members);
 		}
 
@@ -110,20 +126,28 @@ namespace DotNetMessagingApplication.Server.Services
 			return await _chatRepository.DeleteChat(chatId);
 		}
 
-		public async Task<IEnumerable<Chat>> GetChatsForUser(int userId)
+		public async Task<Chat?> GetChatById(int chatId)
 		{
-			return await _chatRepository.GetChatsForUser(userId);
+			return await _chatRepository.GetChatById(chatId);
+        }
+
+        public async Task<IEnumerable<Chat>> GetChatsForUser(string username)
+		{
+			return await _chatRepository.GetChatsForUser(username);
 		}
 
-		public async Task<IEnumerable<Chat>> GetDirectMessagesForUser(int userId)
+		public async Task<IEnumerable<Chat>> GetDirectMessagesForUser(string username)
 		{
-			var chats = await _chatRepository.GetChatsForUser(userId);
-			return chats.Where(c => c is DirectMessage);
-		}
-		public async Task<IEnumerable<Chat>> GetGroupChatsForUser(int userId)
+			return await _chatRepository.GetDirectMessagesForUser(username);
+        }
+		public async Task<IEnumerable<Chat>> GetGroupChatsForUser(string username)
 		{
-			var chats = await _chatRepository.GetChatsForUser(userId);
-			return chats.Where(c => c is GroupChat);
+			return await _chatRepository.GetGroupChatsForUser(username);
 		}
+
+		public async Task<int> UpdateChat(Chat chat)
+		{
+			return await _chatRepository.UpdateChat(chat);
+        }
 	}
 }

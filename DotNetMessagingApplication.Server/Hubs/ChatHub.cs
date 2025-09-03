@@ -20,7 +20,7 @@ namespace DotNetMessagingApplication.Server.Hubs
 		}
 
 		#region messages
-		public async Task SendMessage([FromBody] SendMessageRequest sentMessage)
+		public async Task SendMessage(SendMessageRequest sentMessage)
 		{
 			if (sentMessage == null)
 			{
@@ -28,25 +28,44 @@ namespace DotNetMessagingApplication.Server.Hubs
 				return;
 			}
 
-			var message = new Message
+			var chat = await _chatService.GetChatById(sentMessage.ChatId);
+			if (chat == null)
 			{
-				MessageBody = sentMessage.Message,
-				SenderId = sentMessage.SenderId,
-				ChatId = sentMessage.ChatId,
-				ImageUrl = sentMessage.ImageUrl,
-            };
+				throw new Exception("Chat not found :(");
+			}
 
-            var savedMessage = _messageService.SendMessage(message);
+			try
+			{
+				var message = new Message
+				{
+					MessageBody = sentMessage.Message,
+					SenderId = sentMessage.SenderId,
+					ChatId = sentMessage.ChatId,
+					ImageUrl = sentMessage.ImageUrl,
+					RecipientChat = chat,
+					RecipientChatId = chat.ChatId,
+					Chat = chat,
+				};
 
-			await Clients.Group(sentMessage.ChatId.ToString()).SendAsync("ReceiveMessage", savedMessage);
+				chat.Messages.Add(message);
+
+				var savedMessage = _messageService.SendMessage(message);
+				await _chatService.UpdateChat(chat);
+
+				await Clients.Group(sentMessage.ChatId.ToString()).SendAsync("ReceiveMessage", savedMessage);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
 		}
 
-		public async Task DeleteMessage([FromBody] DeleteMessageRequest deletedMessage)
+		public async Task DeleteMessage(DeleteMessageRequest deletedMessage)
 		{
 			try
 			{
 				int messageId = deletedMessage.MessageId;
-                int affectedRows = await _messageService.DeleteMessage(messageId);
+				int affectedRows = await _messageService.DeleteMessage(messageId);
 				if (affectedRows > 0)
 				{
 					await Clients.All.SendAsync("MessageDeleted", messageId);
@@ -62,7 +81,7 @@ namespace DotNetMessagingApplication.Server.Hubs
 			}
 		}
 
-		public async Task EditMessage([FromBody] EditMessageRequest editedMessage)
+		public async Task EditMessage(EditMessageRequest editedMessage)
 		{
 			try
 			{
@@ -78,18 +97,18 @@ namespace DotNetMessagingApplication.Server.Hubs
 				else
 				{
 					await Clients.Caller.SendAsync("ReceiveError", "Failed to edit message.");
-                }
-            }
+				}
+			}
 			catch (Exception ex)
 			{
 				await Clients.Caller.SendAsync("ReceiveError", $"Error editing message: {ex.Message}");
-            }
-        }
+			}
+		}
 
 		#endregion
 
 		#region chats
-		public async Task CreateGroupChat([FromBody] CreateChatRequest request)
+		public async Task CreateChat(CreateChatRequest request)
 		{
 			if (request == null)
 			{
@@ -98,17 +117,40 @@ namespace DotNetMessagingApplication.Server.Hubs
 			}
 			try
 			{
-				await _chatService.CreateChat(request.CreatorId, request.ParticipantIds, request.ChatName);
-                await Clients.All.SendAsync("ChatCreated", request.ChatName);
+				await _chatService.CreateChat(request.CreatorUser, request.ParticipantUsers, request.ChatName);
+				await Clients.All.SendAsync("ChatCreated", request.ChatName);
 
-            }
-            catch (Exception ex)
+			}
+			catch (Exception ex)
 			{
 				await Clients.Caller.SendAsync("ReceiveError", $"Error creating group chat: {ex.Message}");
+			}
+		}
+
+		public async Task<GetChatResponse> ChangeChat(GetChatRequest request)
+		{
+			var chat = await _chatService.GetChatById(request.ChatId);
+			if (chat == null)
+			{
+                await Clients.Caller.SendAsync("ReceiveError", "Chat data is missing.");
+				return new GetChatResponse();
             }
+			var chatDto = new GetChatResponse
+			{
+				ChatId = chat.ChatId,
+				ChatName = chat is GroupChat groupChat ? groupChat.ChatName : string.Empty,
+				Messages = chat.Messages != null
+					? chat.Messages.Select(m => new MessageDto
+					{
+						MessageId = m.MessageId,
+						SenderUser = m.Sender.Username,
+						Body = m.MessageBody
+					}).ToList() : new List<MessageDto>(),
+			};
+			return chatDto;
         }
 
-		public async Task DeleteChat([FromBody] DeleteChatRequest request)
+		public async Task DeleteChat(DeleteChatRequest request)
 		{
 			try
 			{
@@ -127,25 +169,56 @@ namespace DotNetMessagingApplication.Server.Hubs
 			}
 		}
 
-		public async Task GetChats(int userId)
+		public async Task GetChats(string username)
 		{
-			var chats = _chatService.GetChatsForUser(userId);
+			var chats = _chatService.GetChatsForUser(username);
 			await Clients.Caller.SendAsync("ReceiveChats", chats);
 		}
 
-		public async Task GetDirectMessages(int userId)
+		public async Task<List<GetChatResponse>> GetDirectMessages(string username)
 		{
-			var chats = _chatService.GetDirectMessagesForUser(userId);
-			await Clients.Caller.SendAsync("ReceiveDms", chats);
-        }
+			var chats = (IEnumerable<DirectMessage>) await _chatService.GetDirectMessagesForUser(username);
 
-		public async Task GetGroupChats(int userId)
+			var chatDtos = chats.Select(chat => new GetChatResponse
+			{
+				ChatId = chat.ChatId,
+				ChatName = string.Empty,
+				Messages = chat.Messages != null
+					? chat.Messages.Select(m => new MessageDto
+					{
+						MessageId = m.MessageId,
+						SenderUser = m.Sender.Username,
+						Body = m.MessageBody
+
+					}).ToList() : new List<MessageDto>(),
+			}).ToList();
+
+			return chatDtos;
+		}
+
+		public async Task<List<GetChatResponse>> GetGroupChats(string username)
 		{
-			var chats = _chatService.GetGroupChatsForUser(userId);
-			await Clients.Caller.SendAsync("ReceiveGroupChats", chats);
-        }
+			var chats = (IEnumerable<GroupChat>) await _chatService.GetGroupChatsForUser(username);
 
-        public async Task JoinChatGroup(int chatId)
+			var chatDtos = chats.Select(chat => new GetChatResponse
+			{
+				ChatId = chat.ChatId,
+				ChatName = chat.ChatName,
+				Messages = chat.Messages != null
+					? chat.Messages.Select(m => new MessageDto
+				{
+					MessageId = m.MessageId,
+					SenderUser = m.Sender.Username,
+					Body = m.MessageBody
+
+				}).ToList() : new List<MessageDto>(),
+			}). ToList();
+
+			return chatDtos;
+		}
+
+
+		public async Task JoinChatGroup(int chatId)
 		{
 			await Groups.AddToGroupAsync(Context.ConnectionId, chatId.ToString());
 		}

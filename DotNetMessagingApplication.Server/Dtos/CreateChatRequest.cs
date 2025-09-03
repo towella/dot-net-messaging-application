@@ -6,10 +6,11 @@ namespace DotNetMessagingApplication.Server.Dtos
 	public class CreateChatRequest
 	{
 		[JsonProperty("chatName")]
-		public string ChatName { get; set; } = string.Empty;
+		public string ChatName { get; set; } = null!;
 		[JsonProperty("participantIds")]
-		public List<int> ParticipantIds { get; set; } = new List<int>();
-		[JsonProperty("creatorId")]
-		public int CreatorId { get; set; } // for group chats, the user creating the chat is the admin
+		public List<string> ParticipantUsers { get; set; } = new List<string>();
+
+		[JsonProperty("creatorUser")]
+		public string CreatorUser { get; set; } = null!; // for group chats, the user creating the chat is the admin
 	}
 }

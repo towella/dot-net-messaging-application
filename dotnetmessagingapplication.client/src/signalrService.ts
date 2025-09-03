@@ -1,4 +1,5 @@
 import { HubConnectionBuilder, HubConnection, LogLevel } from "@microsoft/signalr";
+import type { Chat } from "./types";
 
 class SignalRService {
     public connection: HubConnection | null = null;
@@ -17,10 +18,6 @@ class SignalRService {
         this.connection?.on("ReceiveMessage", callback);
     }
 
-    async joinChatGroup(chatId: number) {
-        await this.connection?.invoke("JoinChatGroup", chatId);
-    }
-
     async sendMessage(request: { senderId: number, chatId: number, message: string }) {
         await this.connection?.invoke("SendMessage", request);
     }
@@ -34,12 +31,25 @@ class SignalRService {
     }
 
     // Chat actions
-    async createGroupChat(request: { creatorId: number, participantIds: number[], chatName: string }) {
-        await this.connection?.invoke("CreateGroupChat", request);
+    async createChat(request: { creatorUser: string, participantUsers: string[], chatName: string }) {
+        await this.connection?.invoke("CreateChat", request);
     }
     async deleteChat(request: { chatId: number }) {
         await this.connection?.invoke("DeleteChat", request);
     }
+
+    async changeChat(request: { chatId: number }): Promise<Chat[]> {
+        return await this.connection?.invoke("ChangeChat", request) ?? [];
+    }
+
+    async getDirectMessages(username: string): Promise<Chat[]> {
+        return await this.connection?.invoke("GetDirectMessages", username) ?? [];
+    }
+
+    async getGroupChats(username: string): Promise<Chat[]> {
+        return await this.connection?.invoke("GetGroupChats", username) ?? [];
+    }
+
 
     // Event listeners
     onMessageEdited(callback: (messageId: number, newContent: string) => void) {
