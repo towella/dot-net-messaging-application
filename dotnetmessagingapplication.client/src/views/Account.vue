@@ -99,7 +99,7 @@
 
             <div class="account-item">
                 <label for="phone">Phone: </label>
-                <input v-model="newPhone" id="phone" type="number" placeholder="Phone..."/>
+                <input v-model="newPhone" id="phone" placeholder="Phone..."/>
             </div>
 
             <div class="account-item">
