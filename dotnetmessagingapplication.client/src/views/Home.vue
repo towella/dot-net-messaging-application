@@ -45,15 +45,6 @@
 
             await signalrService.startConnection("https://localhost:7157/chatHub");
 
-            // Listen for incoming messages
-            signalrService.onMessageReceived((message: types.Message) => {
-                // Find the chat by message.chatId and push the message
-                const chat = this.chats.find(c => c.chatId === message.chatId);
-                if (chat) {
-                    chat.messages.push(message);
-                }
-            });
-
             signalrService.onMessageEdited((messageId, newContent) => {
                 for (const chat of this.chats) {
                     const msg = chat.messages.find(m => m.id === messageId);
@@ -111,7 +102,7 @@
                         id: null,
                         chatId: chat.chatId,
                         authorId: this.id,
-                        authorName: this.$route.params.username as string,
+                        senderUser: this.$route.params.username as string,
                         body: messageText,
                     };
 
@@ -123,10 +114,6 @@
                         message: messageText,
                         senderId: this.id
                     });
-
-                    const updatedChat = { ...this.chats[this.selectedChatIndex] };
-                    updatedChat.messages = [...updatedChat.messages, message];
-                    this.chats[this.selectedChatIndex] = updatedChat
                 }
             },
             
