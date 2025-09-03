@@ -7,7 +7,7 @@ export interface Chat {
 export interface Message {
   id: number | null,
   authorId: number,
-  authorName: string,
+  senderUser: string,
   body: string,
   chatId: number,
   imageUrl?: string,

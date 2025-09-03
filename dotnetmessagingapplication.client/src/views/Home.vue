@@ -123,6 +123,10 @@
                         message: messageText,
                         senderId: this.id
                     });
+
+                    const updatedChat = { ...this.chats[this.selectedChatIndex] };
+                    updatedChat.messages = [...updatedChat.messages, message];
+                    this.chats[this.selectedChatIndex] = updatedChat
                 }
             },
             
@@ -283,7 +287,7 @@
             <div id="chat-window">
                 <MessageBubble v-if="chats[selectedChatIndex]?.messages.length > 0" 
                     v-for="m in chats[selectedChatIndex]?.messages"
-                    :sender="m.authorName" :body="m.body" :image-url="m.imageUrl" :external-message="m.authorName != $route.params.username"></MessageBubble>
+                    :sender="m.senderUser" :body="m.body" :image-url="m.imageUrl" :external-message="m.senderUser != $route.params.username"></MessageBubble>
                 <p v-else style="align-self: center;">No one has said anything yet. Start the conversation!</p>
             </div>
 
