@@ -10,5 +10,5 @@ export interface Message {
   senderUser: string,
   body: string,
   chatId: number,
-  imageUrl?: string,
+  imageUrl?: string | null,
 }
