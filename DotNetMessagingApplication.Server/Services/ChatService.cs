@@ -19,7 +19,7 @@ namespace DotNetMessagingApplication.Server.Services
 			_context = context;
 		}
 
-		public async Task<Chat> CreateChat(int creatorId, IEnumerable<int> participantIds, string chatName)
+		public async Task<Chat> CreateChat(int creatorId, IEnumerable<int> participantIds, string? chatName)
 		{
 			int count = participantIds.Count();
 
@@ -33,7 +33,7 @@ namespace DotNetMessagingApplication.Server.Services
 				return await CreateDirectMessage(user1, user2);
 			}
 
-			return await CreateGroupChatAsync(creatorId, participantIds, chatName);
+			return await CreateGroupChatAsync(creatorId, participantIds, chatName!);
 		}
 
 
