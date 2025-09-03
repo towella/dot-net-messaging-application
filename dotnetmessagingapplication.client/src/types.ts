@@ -1,5 +1,5 @@
 export interface Chat {
-  id: number,
+  chatId: number,
   name: string,
   messages: Array<Message>,
 }

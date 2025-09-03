@@ -12,13 +12,23 @@
         data() {
             return {
                 chatListTabSelected: "dm",
-                chats: [{id: 32, name: "da boyz", messages: [{authorId: 45, authorName: "Name", body: "message!!"}]},
-                        {id: 60, name: "pijins", messages: []}
-                ] as Array<types.Chat>,
+                chats: [] as types.Chat[],
                 selectedChatIndex: 0,
                 id: -1,
             };
         },
+        computed: {
+            chatHeading(): string {
+                const chat = this.chats[this.selectedChatIndex];
+                if (this.chatListTabSelected === 'dm') {
+                    return 'Chat Name';
+                } 
+                else {
+                    return chat.name ?? 'Chat Name';
+                }
+            }
+        },
+
 
         // lifecycle hook (called on mount)
         async mounted() {
@@ -33,13 +43,12 @@
             .then(r => r.json())
             this.id = response.id;
 
-            // Start SignalR connection (replace with your backend SignalR hub URL)
             await signalrService.startConnection("https://localhost:7157/chatHub");
 
             // Listen for incoming messages
             signalrService.onMessageReceived((message: types.Message) => {
                 // Find the chat by message.chatId and push the message
-                const chat = this.chats.find(c => c.id === message.chatId);
+                const chat = this.chats.find(c => c.chatId === message.chatId);
                 if (chat) {
                     chat.messages.push(message);
                 }
@@ -60,7 +69,7 @@
             });
 
             signalrService.onChatDeleted((chatId) => {
-                const idx = this.chats.findIndex(c => c.id === chatId);
+                const idx = this.chats.findIndex(c => c.chatId === chatId);
                 if (idx !== -1) this.chats.splice(idx, 1);
             });
 
@@ -69,14 +78,25 @@
                     this.chats = chats;
                     this.selectedChatIndex = 0;
                 });
+                signalrService.connection.on("ReceiveMessage", async (chats) => {
+                    this.chats = chats;
+                    console.log("Received DMs:", chats);
+                    for (const chat of this.chats) {
+                        await signalrService.connection?.invoke("JoinChatGroup", chat.chatId);
+                    }
+                });
             }
-            // Optionally, load DMs by default
-            this.chats = await this.fetchChats("dm");
         },
 
         methods: {
             async changeChat(chatId: number) {
-                this.selectedChatIndex = this.chats.findIndex(c => c.id === chatId);
+                this.selectedChatIndex = this.chats.findIndex(c => c.chatId === chatId);
+                const chat = this.chats[this.selectedChatIndex];
+                console.log(chat)
+                var newChat = await signalrService.changeChat({ chatId: chat.chatId }) // returns chat[];
+                console.log("new chat", newChat)
+                chat.messages = newChat.messages;
+                console.log(chat)
             },
 
             async sendMessage() {
@@ -85,9 +105,11 @@
 
                 if (messageInput && messageText !== "") {
                     const chat = this.chats[this.selectedChatIndex];
+                    console.log(chat.chatId)
+                    console.log(chat)
                     const message: types.Message = {
                         id: null,
-                        chatId: chat.id,
+                        chatId: chat.chatId,
                         authorId: this.id,
                         authorName: this.$route.params.username as string,
                         body: messageText,
@@ -97,7 +119,7 @@
                     messageInput.value = "";
 
                     await signalrService.sendMessage({
-                        chatId: chat.id,
+                        chatId: chat.chatId,
                         message: messageText,
                         senderId: this.id
                     });
@@ -112,8 +134,8 @@
                 await signalrService.deleteMessage({ messageId });
             },
 
-            async createGroupChat(participantIds: number[], chatName: string) {
-                await signalrService.createGroupChat({ creatorId: this.id, participantIds, chatName });
+            async createChat(participantUsers: string[], chatName: string) {
+                await signalrService.createChat({ creatorUser: this.$route.params.username as string, participantUsers, chatName });
             },
 
             async deleteChat(chatId: number) {
@@ -122,25 +144,56 @@
 
             async switchTab(tab: string) {
                 this.chatListTabSelected = tab;
-                this.chats = await this.fetchChats(tab);
+                if (tab === "dm") {
+                    this.chats = await this.getDirectMessages(this.$route.params.username as string);
+                } else if (tab === "gc") {
+                    this.chats = await this.getGroupChats(this.$route.params.username as string);
+                }
+
+                console.log("switched tabs", this.chats);
             },
 
-            async fetchChats(tab: string) {
-                if (!signalrService.connection) return new Array<types.Chat>;
-                if (tab === "dm") {
-                    return await signalrService.connection.invoke("GetDirectMessagesForUser", this.id);
-                } else if (tab === "gc") {
-                    return await signalrService.connection.invoke("GetGroupChatsForUser", this.id);
-                }
-                return new Array<types.Chat>;
+            async getDirectMessages(username: string): Promise<types.Chat[]> {
+                return await signalrService.getDirectMessages(username);
+            },
+
+            async getGroupChats(username: string): Promise<types.Chat[]> {
+                return await signalrService.getGroupChats(username);
             },
 
             createNewChat() {
+                const creatorUser = this.$route.params.username as string;
                 var userNames: Array<string> = [];
                 var username: string | null = prompt("Create chat with: (leave empty to create) ", "");
                 while (username != null && username != "") {
                     userNames.push(username);
                     username = prompt("Create chat with: (leave empty to create) ", "");
+                }
+
+                if (userNames.length === 0) {
+                    alert("No users added. Chat not created.");
+                    return;
+                }
+
+                if (userNames.length === 1) {
+                    // Direct Message
+                    const request = {
+                        creatorUser: creatorUser,
+                        participantUsers: [userNames[0]],
+                        chatName: userNames[0]
+                    };
+                    this.createChat(request.participantUsers, request.chatName);
+                    this.switchTab("dm");
+                } else {
+                    // Group Chat
+                    const chatName = prompt("Enter a name for the group chat:", "My Group Chat");
+                    const request = {
+                        creatorId: creatorUser,
+                        participantUsers: userNames,
+                        chatName: chatName || "My Group Chat"
+                    };
+                    this.createChat(request.participantUsers, request.chatName);
+                    this.switchTab("gc");
                 }
 
                 // create a chat with userNames in it
@@ -158,7 +211,7 @@
 
                 const formData = new FormData();
                 formData.append("image", file);
-                formData.append("chatId", this.chats[this.selectedChatIndex].id.toString());
+                formData.append("chatId", this.chats[this.selectedChatIndex].chatId.toString());
                 formData.append("senderId", this.id.toString());
 
                 try {
@@ -178,7 +231,7 @@
                 } catch (err) {
                     console.error("Unexpected error:", err);
                 }
-            }
+            },
         }
     });
 </script>
@@ -213,14 +266,14 @@
             </div>
 
             <div v-if="chats.length > 0" v-for="chat in chats">
-                <ChatSelectBox :chat-name="chat.name" :last-message="chat.messages[chat.messages.length-1]?.body ?? 'No messages yet...'" v-on:click="changeChat(chat.id)"></ChatSelectBox>
+                <ChatSelectBox :chat-name="chat.name" :last-message="chat.messages[chat.messages.length-1]?.body ?? 'No messages yet...'" v-on:click="changeChat(chat.chatId)"></ChatSelectBox>
             </div>
             <p v-else>No chats, time to start a conversation!</p>
         </div>
 
         <div id="chat-window-container">
             <div id="chat-window-header">
-                <h2 id="chat-heading">Chat Name</h2>
+                <h2 id="chat-heading">{{ chatHeading }}</h2>
                 <div id="call-buttons">
                     <RouterLink :to="{name: 'Login'}"><img src="../assets/icons/call.png" style="width: 40px;"/></RouterLink>
                     <RouterLink :to="{name: 'Login'}"><img src="../assets/icons/video.png" style="width: 40px;"/></RouterLink>
@@ -237,10 +290,10 @@
             <div id="input-bar">
                 <textarea id="message-input" type="text" placeholder="Message the chat..."></textarea>
                 <input type="file" id="image-input" accept="image/*" style="display: none;" @change="sendImage" />
-                <button @click="triggerImageUpload">
-                    <img src="../assets/icons/image.png" style="width: 30px;" />
+                <!-- yall idk why the button is slightly higher than the rest i cbb fixing it rn -->
+                <button @click="triggerImageUpload" style="padding:0; width: 75px;">
+                    <img src="../assets/icons/image.png" style="height: 50px;" />
                 </button>
-
                 <button id="send-button" v-on:click="sendMessage()">Send</button>
             </div>
         </div>

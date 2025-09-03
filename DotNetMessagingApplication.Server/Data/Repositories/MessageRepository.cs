@@ -20,9 +20,9 @@ namespace DotNetMessagingApplication.Server.Data.Repositories
 
 		public async Task<int> AddMessage(Message message)
 		{
-			await _messagingAppContext.Messages.AddAsync(message);
-			return await _messagingAppContext.SaveChangesAsync();
-		}
+            _messagingAppContext.Set<Message>().Add(message);
+            return await _messagingAppContext.SaveChangesAsync(); // Save to generate ChatId
+        }
 
 		public async Task<int> DeleteMessage(int messageId)
 		{

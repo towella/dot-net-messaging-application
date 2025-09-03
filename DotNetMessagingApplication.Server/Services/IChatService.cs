@@ -4,7 +4,9 @@ public interface IChatService
 {
 	Task<Chat> CreateChat(string creatorUser, IEnumerable<string> participantUsers, string? chatName);
 	Task<int> DeleteChat(int chatId);
-	Task<IEnumerable<Chat>> GetChatsForUser(int userId);
-	Task<IEnumerable<Chat>> GetDirectMessagesForUser(int userId);
-	Task<IEnumerable<Chat>> GetGroupChatsForUser(int userId);
+	Task<IEnumerable<Chat>> GetChatsForUser(string username);
+	Task<IEnumerable<Chat>> GetDirectMessagesForUser(string username);
+	Task<IEnumerable<Chat>> GetGroupChatsForUser(string username);
+	Task<Chat?> GetChatById(int chatId);
+	Task<int> UpdateChat(Chat chat);
 }
